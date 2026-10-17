@@ -2,6 +2,7 @@ import { chromium } from '@playwright/test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import { createHash } from 'node:crypto';
+import { execFileSync } from 'node:child_process';
 
 const base=process.env.PREVIEW_URL||'http://127.0.0.1:4180';
 await fs.mkdir('evidence',{recursive:true});
@@ -52,6 +53,9 @@ try {
   await page.locator('#reference').selectOption('autumn-approved.png');
   await page.locator('.reference-image img').evaluate(img=>img.decode());
   await page.screenshot({path:'evidence/06-autumn-comparison.png',fullPage:true});
+  await page.locator('#reference').selectOption('previous-composition.png');
+  await page.locator('.reference-image img').evaluate(img=>img.decode());
+  await page.screenshot({path:'evidence/08-before-after-review.png',fullPage:true});
   checks.push({name:'reference selection never changes terrain or season',passed:true});
   const responsive=[];
   for(const width of [1440,1024,768,390]){
@@ -86,13 +90,46 @@ try {
     return {id:m.id,matrixError,boundsError};
   });
   await fs.writeFile('evidence/asset-alignment.json',JSON.stringify({maxMatrixError,maxBoundsError,alignment},null,2));
-  console.log(JSON.stringify({maxMatrixError,maxBoundsError,alignment},null,2));
   assert.ok(maxMatrixError<.001,`Asset CTM changed by ${maxMatrixError}`);
   assert.ok(maxBoundsError<1,`Asset bounds changed by ${maxBoundsError}px`);
   checks.push({name:'real SVG snapshot matches live source placement',mock:false,passed:true,maxMatrixError,maxBoundsError,boundsTolerancePx:1,note:'Transforms are checked separately at 0.001 tolerance. The observatory has a recorded subpixel bounds difference after SVG isolation; this is not a pixel-identical full-scene claim.',alignment});
+  // The immutable source is verified above. The delivered composition intentionally relocates it.
+  const source=await fs.readFile('public/reference/live-assets.svg','utf8');
+  const repositorySource=execFileSync('git',['show','HEAD:public/reference/live-assets.svg'],{encoding:'utf8',maxBuffer:20*1024*1024});
+  const normalize=text=>text.replace(/\r\n/g,'\n');
+  assert.equal(hash(Buffer.from(normalize(source))),hash(Buffer.from(normalize(repositorySource))));
+  const sourcePreservation={matchesCommittedSource:true,normalizedSha256:hash(Buffer.from(normalize(source))),historicalCaptureSha256:provenance.assetsSha256,historicalCaptureHashMatches:hash(Buffer.from(source))===provenance.assetsSha256,note:'The historical provenance checksum already differs from the committed snapshot. Preservation is checked against Git HEAD with line endings normalized, plus subtree equality below.'};
+  const placements=await page.evaluate(()=>window.landscape.assets());
+  const relocatedSvg=await page.evaluate(()=>window.landscape.assetSvg());
+  await assetPage.goto('about:blank');
+  await assetPage.setContent('<style>body{margin:0}svg{display:block}</style>'+relocatedSvg);
+  const relocated=await assetPage.evaluate(({placements,source})=>{
+    const original=new DOMParser().parseFromString(source,'image/svg+xml');
+    return placements.map(p=>{
+      const element=document.getElementById(p.id),m=element.getCTM(),b=element.getBoundingClientRect();
+      const sourceGroup=original.querySelector(`[data-source-id="${p.id}"]`);
+      const movedGroup=document.querySelector(`[data-source-id="${p.id}"]`);
+      return {id:p.id,sourceGeometryUnchanged:sourceGroup.isEqualNode(movedGroup),ctm:{a:m.a,b:m.b,c:m.c,d:m.d,e:m.e,f:m.f},bounds:{x:b.x,y:b.y,width:b.width,height:b.height},visible:b.right>0&&b.left<1200&&b.bottom>0&&b.top<800};
+    });
+  },{placements,source});
+  assert.equal(relocated.length,10);
+  const relocationReport=relocated.map(m=>{
+    const p=placements.find(p=>p.id===m.id),original=provenance.anchors.find(a=>a.id===m.id);
+    const expected={a:original.ctm.a*p.scale,b:original.ctm.b*p.scale,c:original.ctm.c*p.scale,d:original.ctm.d*p.scale,e:original.ctm.e*p.scale+p.dx,f:original.ctm.f*p.scale+p.dy};
+    const matrixError=Math.max(...Object.keys(expected).map(k=>Math.abs(expected[k]-m.ctm[k])));
+    assert.ok(matrixError<.001,`${m.id} relocation matrix error ${matrixError}`);
+    assert.ok(m.visible,`${m.id} disappeared from frame`);
+    assert.ok(m.sourceGeometryUnchanged,`${m.id} original geometry was modified`);
+    return {...p,...m,matrixError,expected};
+  });
+  const house=relocationReport.find(p=>p.id==='living-cottage-haven');
+  assert.equal(house.scale,1);
+  assert.ok(Math.abs(house.bounds.width-422.4)<1);
+  await fs.writeFile('evidence/asset-placement.json',JSON.stringify({version:'0.2',sourcePreservation,passed:true,assets:relocationReport},null,2));
+  checks.push({name:'all ten original SVG groups preserved, placed on terrain and visible; house retains original size',passed:true,maxMatrixError:Math.max(...relocationReport.map(p=>p.matrixError))});
   const stats=await page.evaluate(()=>window.landscape.stats());
   assert.equal(errors.length,0,errors.join('\n'));
-  const report={passed:true,url:base,browser:browser.version(),renderer:'Chromium WebGL / SwiftShader software renderer, not a hardware performance benchmark',consoleErrors:errors,stats,checks,artApproval:'NOT PASSED. Engineering checks do not assert artistic acceptance.'};
+  const report={version:'0.2',passed:true,url:base,browser:browser.version(),renderer:'Chromium WebGL / SwiftShader software renderer, not a hardware performance benchmark',consoleErrors:errors,stats,checks,artApproval:'PENDING REVIEW. Engineering checks do not assert artistic acceptance.'};
   await fs.writeFile('evidence/browser-report.json',JSON.stringify(report,null,2));
   console.log(JSON.stringify({passed:true,consoleErrors:errors,stats,maxMatrixError,maxBoundsError,checks:checks.length},null,2));
 } catch(error) {

@@ -1,8 +1,8 @@
 # Live With Me · Landscape V2
 
-独立的 React + TypeScript + Vite + Three.js 实验，版本 0.1。
+React + TypeScript + Vite + Three.js 景观实验，当前版本 V0.2，在原仓库持续迭代。
 
-**本轮交付工程、无云海地形、真实资产对照及检查证据。当前美术未达标，不能宣称 V0.1 已通过验收。** 没有进入云海、冬季或复杂光照阶段。
+**本轮交付重新组织空间关系的无云海构图。主屋保留原体量，10 组真实 SVG 资产按地形重新定位。** 工程检查与人工视觉验收分开；本轮没有进入云海、冬季或复杂光照阶段。具体变化、旧版对照与剩余问题见 [REVIEW.md](REVIEW.md)。
 
 ## 启动
 
@@ -35,12 +35,15 @@ npm run preview
 | 桌面预览 | `evidence/05-desktop-review.png` |
 | 秋季定稿图对照 | `evidence/06-autumn-comparison.png` |
 | 390px 窄屏预览 | `evidence/07-mobile-review.png` |
+| V0.2 / V0.1 同屏对照 | `evidence/08-before-after-review.png` |
+| 迭代前截图和检查基线 | `evidence/v01/` |
 | 真实项目场景截图（隔离实际 SVG） | `public/reference/live-overview.png` |
 | 资产来源、变换和时间 | `public/reference/provenance.json` |
 | 高程 / 坡度 / 法线 / 边界 / 投影 | `evidence/geometry-report.json` |
 | 步行路径 501 点 | `evidence/walk-route.csv` |
 | 浏览器和导出检查 | `evidence/browser-report.json` |
 | 真实资产变换核对 | `evidence/asset-alignment.json` |
+| 新布局坐标、缩放、原始几何保留核对 | `evidence/asset-placement.json` |
 | 正式仓库保护检查 | `evidence/source-unchanged.json` |
 
 简短结构说明见 [ARCHITECTURE.md](ARCHITECTURE.md)，本轮差距和验收边界见 [REVIEW.md](REVIEW.md)。
@@ -64,7 +67,7 @@ npm run test:visual
 
 本轮还从 **正式工作树实际运行的 http://127.0.0.1:4178/** 获取了真实 Overview。使用实际源码，包括原有未提交修改；不是旧 dist，不是 Mock。截图选择黄昏主题，原 Overview 保持 `(0,135,0.66)`。
 
-资产对照是从真实 DOM 隔离的静态 SVG 快照，共 10 个资产组，保留原始几何、位置、scale 和祖先变换。它不导入旧景观代码，不把资产变成 Three.js Sprite / 纹理 Mesh，不声称已迁移交互或完成正式集成。
+原始对照是从真实 DOM 隔离的静态 SVG 快照，共 10 个资产组。`public/reference/live-assets.svg` 保留原始几何和祖先变换；V0.2 在外层按 `src/composition/assets.ts` 的地形落点移动和等比缩放各组。预览与导出共用同一套布局。它不导入旧景观代码，不把资产变成 Three.js Sprite / 纹理 Mesh，不声称已迁移交互或完成正式集成。
 
 如果需要重新抓取，先确认正式项目正在 4178 运行。若未运行，本实验提供只读源码宿主：
 
@@ -85,4 +88,4 @@ node scripts/verify-source-unchanged.mjs
 
 ## 本轮停止点
 
-人工审阅本轮无云海构图后，再决定如何修改山群尺度、坡肩与远景投影。本实验不自动启动后续季节、云海、天气或正式仓库集成。
+V0.2 保持原正交地面轴，已放宽资产坐标约束并重排坡肩、田块、谷地与山群。可以在“参考对照”选择“V0.1 旧构图”审阅变化。后续美术迭代重点是山体轮廓、谷底层次和资产逐脚点接地；云海、天气和正式交互集成仍未启动。

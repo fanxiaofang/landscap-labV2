@@ -1,12 +1,13 @@
 {
+  "version": "0.2",
   "passed": true,
   "url": "http://127.0.0.1:4180",
   "browser": "141.0.7390.37",
   "renderer": "Chromium WebGL / SwiftShader software renderer, not a hardware performance benchmark",
   "consoleErrors": [],
   "stats": {
-    "drawCalls": 44,
-    "triangles": 97230,
+    "drawCalls": 46,
+    "triangles": 108985,
     "wireframe": false
   },
   "checks": [
@@ -16,7 +17,7 @@
         "width": 1200,
         "height": 800
       },
-      "sha256": "d4f2c8b83c22a03267866d2a03f24ea6ed09e8f7680ceb631a9ce3dbd5b98a7b"
+      "sha256": "fab0d5eb29b6387ae0ab2bef2925c9c973230a3ab922db2071882835efbfd496"
     },
     {
       "name": "02-real-assets-composite.png",
@@ -24,7 +25,7 @@
         "width": 1200,
         "height": 800
       },
-      "sha256": "55acb2f98c6cc37ddd03a1afa1913c9c77f6015702411b4b678f121805fcdb95"
+      "sha256": "4bb6c3b5d0d82d421dcfefd9a52580e9013c394c119c155d4e3c4b50abc84b6d"
     },
     {
       "name": "deterministic export",
@@ -200,7 +201,12 @@
           "boundsError": 0
         }
       ]
+    },
+    {
+      "name": "all ten original SVG groups preserved, placed on terrain and visible; house retains original size",
+      "passed": true,
+      "maxMatrixError": 0.000015388151950901374
     }
   ],
-  "artApproval": "NOT PASSED. Engineering checks do not assert artistic acceptance."
+  "artApproval": "PENDING REVIEW. Engineering checks do not assert artistic acceptance."
 }

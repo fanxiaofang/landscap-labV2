@@ -1,8 +1,8 @@
-import { BufferGeometry, Float32BufferAttribute, Vector3, Color, Mesh, MeshBasicMaterial, Group } from 'three';
+import { BufferGeometry, Float32BufferAttribute, Vector3, Color, Mesh, MeshBasicMaterial, Group, CatmullRomCurve3 } from 'three';
 import Delaunator from 'delaunator';
 import { worldPoint } from '../world/projection';
 import { PALETTE } from '../world/environment';
-import { groundHeight, valleyHeight, shoulderDepth, smooth, FIELDS, fieldPoint, RIDGES, GROUND_GRID, type RidgeDefinition } from './layout';
+import { groundHeight, valleyHeight, shoulderDepth, smooth, FIELDS, fieldPoint, RIDGES, GROUND_GRID, WALK_ROUTE, type RidgeDefinition } from './layout';
 
 export function indexedSurface(cols:number,rows:number,sample:(s:number,t:number)=>Vector3) {
   const positions:number[]=[],indices:number[]=[];
@@ -42,12 +42,12 @@ export function buildGround() {
     c.lerp(new Color(shoulderColor(u,d)),smooth(shoulder-120,shoulder+800,d));
     c.lerp(new Color(PALETTE.valley),smooth(shoulder+650,shoulder+1400,d));
     c.lerp(new Color(PALETTE.farValley),smooth(2600,4300,d));
-    c.multiplyScalar(.90+.10*Math.max(0,n.dot(new Vector3(.4,.8,-.3).normalize())));
+    c.multiplyScalar(.86+.14*Math.max(0,n.dot(new Vector3(.4,.8,-.3).normalize())));
     return c;
   });
   return mesh('continuous-meadow-farm-valley',g);
 }
-function shoulderColor(u:number,d:number) {return d>shoulderDepth(u)+450?'#999980':PALETTE.shoulder;}
+function shoulderColor(u:number,d:number) {return d>shoulderDepth(u)+450?'#a0a087':PALETTE.shoulder;}
 
 export function ridgeGeometry(def:RidgeDefinition) {
   const chains=[def.points,...(def.branches??[])];
@@ -110,7 +110,7 @@ export function buildRidges() {
   const group=new Group();group.name='authored-ridge-masses';
   const light=new Vector3(.6,.75,-.2).normalize();
   for(const def of RIDGES){
-    const original=ridgeGeometry(def),g=original.toNonIndexed();original.dispose();g.computeVertexNormals();
+    const g=ridgeGeometry(def);
     colorize(g,(p,n)=>{
       const {d}=plan(p);
       const facing=Math.max(0,n.dot(light));
@@ -144,9 +144,10 @@ export function buildFields() {
 export function buildMeadowZones() {
   const group=new Group();group.name='meadow-material-zones';
   const patches=[
-    {name:'west-shoulder',color:'#7e923c',u0:-1300,u1:140,d0:-480,d1:-760,width:300,bend:180},
-    {name:'near-right-bank',color:'#7b903d',u0:-100,u1:1400,d0:-1180,d1:-680,width:250,bend:-220},
-    {name:'foreground-fold',color:'#718a3c',u0:-1300,u1:600,d0:-1520,d1:-1320,width:200,bend:230},
+    {name:'pasture-back-shoulder',color:'#94a94d',u0:-600,u1:1350,d0:60,d1:-220,width:150,bend:70},
+    {name:'west-shoulder',color:'#7e9744',u0:-1500,u1:1050,d0:-470,d1:-950,width:270,bend:-180},
+    {name:'near-right-bank',color:'#7b9343',u0:-1000,u1:1500,d0:-1000,d1:-730,width:260,bend:-280},
+    {name:'foreground-fold',color:'#6f8b40',u0:-1400,u1:1200,d0:-1450,d1:-1370,width:300,bend:210},
   ];
   for(const p of patches){
     const g=indexedSurface(72,14,(s,t)=>{
@@ -157,5 +158,13 @@ export function buildMeadowZones() {
     });
     colorize(g,()=>new Color(p.color));group.add(mesh(p.name,g));
   }
+  // One narrow access track makes the descent from the living pad to the fields readable.
+  const route=new CatmullRomCurve3(WALK_ROUTE.map(p=>new Vector3(p.u,0,p.d)),false,'catmullrom',.3);
+  const track=indexedSurface(100,2,(s,t)=>{
+    const p=route.getPoint(s),v=route.getTangent(s),width=9;
+    const u=p.x-v.z*(t-.5)*width,d=p.z+v.x*(t-.5)*width;
+    return worldPoint(u,d,groundHeight(u,d)+1.25);
+  });
+  colorize(track,()=>new Color('#b0ad70'));group.add(mesh('farm-access-track',track));
   return group;
 }

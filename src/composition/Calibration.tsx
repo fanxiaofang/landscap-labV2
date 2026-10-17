@@ -1,14 +1,16 @@
 import { projectPoint, measureProjection, PROJECTION } from '../world/projection';
 import { groundHeight, WALK_ROUTE, RIDGES } from '../terrain/layout';
+import { assetLayout } from './assets';
 
 export function Calibration() {
   const projection=measureProjection();
-  const center={u:-39.6,d:42,h:200};
+  const home=assetLayout().find(a=>a.id==='living-cottage-haven')!;
+  const center={u:home.u,d:home.d,h:home.h};
   const line=(dx:number,dz:number)=>{
     const a=projectPoint(center.u-dx,center.d-dz,center.h+.5),b=projectPoint(center.u+dx,center.d+dz,center.h+.5);
     return `${a.x},${a.y} ${b.x},${b.y}`;
   };
-  const samples=[{name:'草甸 +200',u:-40,d:42,h:200},{name:'农田',u:-350,d:690,h:groundHeight(-350,690)},...RIDGES.slice(0,4).map(r=>{const p=r.points.reduce((a,b)=>a.h>b.h?a:b);return {...p,name:r.name};})];
+  const samples=[...assetLayout().filter(a=>['living-cottage-haven','tractor-in-field','yorkshire-railway-viaduct'].includes(a.id)),...RIDGES.slice(0,4).map(r=>{const p=r.points.reduce((a,b)=>a.h>b.h?a:b);return {...p,name:r.name};})];
   return <svg className="calibration" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" aria-label="投影轴与高程校准">
     <g fill="none" stroke="#f9f7e8" strokeWidth="1.2" opacity=".7">
       {[-180,-120,-60,0,60,120,180].map(n=><g key={n}>

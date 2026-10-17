@@ -10,9 +10,9 @@ export const AUTUMN: EnvironmentState = {
   cloudSea:{enabled:false,elevation:-290,thickness:80},
 };
 export const PALETTE = {
-  meadow:'#8a9b40', meadowLight:'#a1ac4c', meadowShade:'#6b833c',
-  shoulder:'#89904e', valley:'#a29b89', farValley:'#c9a5a0',
-  field:['#c7a34c','#d3b257','#be9745','#d5b761'],
-  ridgeLight:'#a9a476',ridgeShadow:'#52675b',ridgeRock:'#96918a',
-  atmosphere:'#b8a4ad',
+  meadow:'#879c43', meadowLight:'#a2b454', meadowShade:'#6b873f',
+  shoulder:'#87965b', valley:'#b7b09c', farValley:'#cdb4ae',
+  field:['#c5a14d','#d3af54','#c39b44','#d9b55e'],
+  ridgeLight:'#9ba083',ridgeShadow:'#5f776b',ridgeRock:'#a49a91',
+  atmosphere:'#c7b4ba',
 };
