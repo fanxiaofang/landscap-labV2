@@ -1,0 +1,8 @@
+node_modules/
+dist/
+.reference-cache/
+.npm-cache/
+*.log
+*.tsbuildinfo
+evidence/live-overview-with-ui.png
+evidence/source-hashes-before.json
