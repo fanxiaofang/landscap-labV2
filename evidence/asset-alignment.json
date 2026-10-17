@@ -1,0 +1,56 @@
+{
+  "maxMatrixError": 0.000006139278411865234,
+  "maxBoundsError": 0.70318603515625,
+  "alignment": [
+    {
+      "id": "yorkshire-railway-viaduct",
+      "matrixError": 0.0000011324882507324219,
+      "boundsError": 0
+    },
+    {
+      "id": "tractor-in-field",
+      "matrixError": 0.000006139278411865234,
+      "boundsError": 0.000030517578125
+    },
+    {
+      "id": "yorkshire-sheep-pen-cluster",
+      "matrixError": 0,
+      "boundsError": 0
+    },
+    {
+      "id": "cottage-pumpkin-patch",
+      "matrixError": 0,
+      "boundsError": 0.001556396484375
+    },
+    {
+      "id": "west-cottage-grounds",
+      "matrixError": 0,
+      "boundsError": 0
+    },
+    {
+      "id": "hilltop-observatory-haven",
+      "matrixError": 0,
+      "boundsError": 0.70318603515625
+    },
+    {
+      "id": "living-cottage-haven",
+      "matrixError": 0,
+      "boundsError": 0
+    },
+    {
+      "id": "capsule-pod-cluster",
+      "matrixError": 0,
+      "boundsError": 0
+    },
+    {
+      "id": "wooden-cabin-cluster",
+      "matrixError": 0,
+      "boundsError": 0
+    },
+    {
+      "id": "yorkshire-sheep-flock-and-dressing",
+      "matrixError": 0,
+      "boundsError": 0
+    }
+  ]
+}

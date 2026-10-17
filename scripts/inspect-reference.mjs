@@ -1,0 +1,12 @@
+import { chromium } from '@playwright/test';
+import fs from 'node:fs/promises';
+await fs.mkdir('evidence', { recursive: true });
+const browser = await chromium.launch({ headless: true });
+const page = await browser.newPage({ viewport: { width: 1200, height: 800 }, deviceScaleFactor: 1 });
+page.on('pageerror', error => console.error(error.message));
+await page.goto('http://127.0.0.1:4178/', { waitUntil: 'networkidle' });
+console.log(await page.locator('button').allTextContents());
+console.log(await page.locator('#panoramic-world-stage').evaluate(el => ({ room: el.dataset.room, transform: getComputedStyle(el).transform })));
+console.log(await page.locator('svg[viewBox="0 0 1200 800"]').evaluate(svg => [...svg.querySelectorAll('g[id]')].map(el => ({id: el.id, parent:el.parentElement.id})).filter(el => !el.parent || /stage|meadow|rail|wheat|mountain/.test(el.id))));
+await page.screenshot({path:'evidence/reference-initial.png'});
+await browser.close();

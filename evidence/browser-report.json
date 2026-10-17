@@ -1,0 +1,206 @@
+{
+  "passed": true,
+  "url": "http://127.0.0.1:4180",
+  "browser": "141.0.7390.37",
+  "renderer": "Chromium WebGL / SwiftShader software renderer, not a hardware performance benchmark",
+  "consoleErrors": [],
+  "stats": {
+    "drawCalls": 44,
+    "triangles": 97230,
+    "wireframe": false
+  },
+  "checks": [
+    {
+      "name": "01-terrain-no-clouds.png",
+      "size": {
+        "width": 1200,
+        "height": 800
+      },
+      "sha256": "d4f2c8b83c22a03267866d2a03f24ea6ed09e8f7680ceb631a9ce3dbd5b98a7b"
+    },
+    {
+      "name": "02-real-assets-composite.png",
+      "size": {
+        "width": 1200,
+        "height": 800
+      },
+      "sha256": "55acb2f98c6cc37ddd03a1afa1913c9c77f6015702411b4b678f121805fcdb95"
+    },
+    {
+      "name": "deterministic export",
+      "passed": true
+    },
+    {
+      "name": "static SVG composite deterministic export",
+      "passed": true
+    },
+    {
+      "name": "actual screenshot button download",
+      "passed": true
+    },
+    {
+      "name": "calibration and wireframe controls",
+      "passed": true
+    },
+    {
+      "name": "reference selection never changes terrain or season",
+      "passed": true
+    },
+    {
+      "name": "responsive layout and synchronized SVG/Canvas bounds",
+      "passed": true,
+      "sizes": [
+        {
+          "width": 1440,
+          "viewport": {
+            "x": 36,
+            "y": 236.5,
+            "width": 1368,
+            "height": 912
+          },
+          "canvas": {
+            "x": 36,
+            "y": 236.5,
+            "width": 1368,
+            "height": 912
+          },
+          "assets": {
+            "x": 36,
+            "y": 236.5,
+            "width": 1368,
+            "height": 912
+          },
+          "scrollWidth": 1440
+        },
+        {
+          "width": 1024,
+          "viewport": {
+            "x": 36,
+            "y": 236.5,
+            "width": 952,
+            "height": 634.65625
+          },
+          "canvas": {
+            "x": 36,
+            "y": 236.5,
+            "width": 952,
+            "height": 634.65625
+          },
+          "assets": {
+            "x": 36,
+            "y": 236.5,
+            "width": 952,
+            "height": 634.65625
+          },
+          "scrollWidth": 1024
+        },
+        {
+          "width": 768,
+          "viewport": {
+            "x": 36,
+            "y": 236.5,
+            "width": 696,
+            "height": 464
+          },
+          "canvas": {
+            "x": 36,
+            "y": 236.5,
+            "width": 696,
+            "height": 464
+          },
+          "assets": {
+            "x": 36,
+            "y": 236.5,
+            "width": 696,
+            "height": 464
+          },
+          "scrollWidth": 768
+        },
+        {
+          "width": 390,
+          "viewport": {
+            "x": 16,
+            "y": 260,
+            "width": 358,
+            "height": 238.65625
+          },
+          "canvas": {
+            "x": 16,
+            "y": 260,
+            "width": 358,
+            "height": 238.65625
+          },
+          "assets": {
+            "x": 16,
+            "y": 260,
+            "width": 358,
+            "height": 238.65625
+          },
+          "scrollWidth": 390
+        }
+      ]
+    },
+    {
+      "name": "real SVG snapshot matches live source placement",
+      "mock": false,
+      "passed": true,
+      "maxMatrixError": 0.000006139278411865234,
+      "maxBoundsError": 0.70318603515625,
+      "boundsTolerancePx": 1,
+      "note": "Transforms are checked separately at 0.001 tolerance. The observatory has a recorded subpixel bounds difference after SVG isolation; this is not a pixel-identical full-scene claim.",
+      "alignment": [
+        {
+          "id": "yorkshire-railway-viaduct",
+          "matrixError": 0.0000011324882507324219,
+          "boundsError": 0
+        },
+        {
+          "id": "tractor-in-field",
+          "matrixError": 0.000006139278411865234,
+          "boundsError": 0.000030517578125
+        },
+        {
+          "id": "yorkshire-sheep-pen-cluster",
+          "matrixError": 0,
+          "boundsError": 0
+        },
+        {
+          "id": "cottage-pumpkin-patch",
+          "matrixError": 0,
+          "boundsError": 0.001556396484375
+        },
+        {
+          "id": "west-cottage-grounds",
+          "matrixError": 0,
+          "boundsError": 0
+        },
+        {
+          "id": "hilltop-observatory-haven",
+          "matrixError": 0,
+          "boundsError": 0.70318603515625
+        },
+        {
+          "id": "living-cottage-haven",
+          "matrixError": 0,
+          "boundsError": 0
+        },
+        {
+          "id": "capsule-pod-cluster",
+          "matrixError": 0,
+          "boundsError": 0
+        },
+        {
+          "id": "wooden-cabin-cluster",
+          "matrixError": 0,
+          "boundsError": 0
+        },
+        {
+          "id": "yorkshire-sheep-flock-and-dressing",
+          "matrixError": 0,
+          "boundsError": 0
+        }
+      ]
+    }
+  ],
+  "artApproval": "NOT PASSED. Engineering checks do not assert artistic acceptance."
+}
