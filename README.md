@@ -2,7 +2,7 @@
 
 当前为 **V0.5 中景山群 benchmark**。三张候选图已完成，**美术未验收，不进入整场景集成**。
 
-五张山体参考统一用于主峰、次峰、鞍部、支脊、远近错位和尺度关系；秋季定稿继续作为构图与色彩基准。只提取山体结构，不复制写实纹理。
+长期规范见 [AGENTS.md](AGENTS.md)，当前实现与扩展方向见 [ARCHITECTURE.md](ARCHITECTURE.md)，图片用途见 [美术参考清单](docs/art-direction/mountain-and-cloud-references.md)。秋季定稿优先级最高；前四张山体图研究自然结构，第五张简化图研究轮廓、大块面和明暗。新增云参考只补充天气与空间研究，不复制摄影质感。
 
 ## 查看
 
@@ -16,7 +16,7 @@ npm run dev
 - `/?view=terrain&clouds=0`：无云海的真实山群、坡脚与谷地。
 - `/?view=terrain&clouds=1`：同一相机与地形上的静态云团遮挡。
 
-默认 benchmark 隐藏田块、道路、Proxy 与正式资产；不提供整场景集成入口。历史代码仍保留，但本轮不对其适配做验收。
+默认 benchmark 隐藏田块、道路、Proxy 与正式资产。显式 `/?study=layout&view=proxy` 可查看保留的布局模式，追加 `&frame=integration` 使用 1200×800 SVG 兼容画幅；这些入口不代表整场景集成已验收。长期要求双视角验证，当前自由调试视角尚未实现。
 
 ## 本轮图像
 
