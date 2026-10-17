@@ -1,4 +1,4 @@
-import { Scene, WebGLRenderer, SRGBColorSpace, Mesh, MeshBasicMaterial, type Object3D } from 'three';
+import { Scene, WebGLRenderer, CanvasTexture, SRGBColorSpace, Mesh, MeshBasicMaterial, type Object3D } from 'three';
 import { createOverviewCamera, FRAME, type Frame } from './projection';
 import { buildGround, buildFields, buildRidges, buildMeadowZones } from '../terrain/geometry';
 import { buildCloudSea } from './cloudSea';
@@ -14,12 +14,20 @@ export class LandscapeRenderer {
   readonly scene=new Scene();
   readonly camera;
   readonly clouds=buildCloudSea();
+  private readonly sky:CanvasTexture;
   private wire=false;
   constructor(canvas:HTMLCanvasElement,readonly frame:Frame=FRAME,readonly benchmark=true) {
     this.camera=createOverviewCamera(frame);
-    this.renderer=new WebGLRenderer({canvas,alpha:true,antialias:true,preserveDrawingBuffer:true,powerPreference:'low-power'});
+    this.renderer=new WebGLRenderer({canvas,alpha:false,antialias:true,preserveDrawingBuffer:true,powerPreference:'low-power'});
     this.renderer.setPixelRatio(1);this.renderer.setSize(frame.width,frame.height,false);
-    this.renderer.outputColorSpace=SRGBColorSpace;this.renderer.setClearColor(0x000000,0);
+    this.renderer.outputColorSpace=SRGBColorSpace;this.renderer.setClearColor(AUTUMN.sky.top,1);
+    // Sky is part of the actual rendered frame, including raw canvas captures.
+    // CSS backgrounds cannot survive canvas export or an opaque screenshot consumer.
+    const skyCanvas=document.createElement('canvas');skyCanvas.width=frame.width;skyCanvas.height=frame.height;
+    const skyContext=skyCanvas.getContext('2d');if(!skyContext)throw new Error('无法创建秋季天空画布');
+    drawSky(skyContext,frame.width,frame.height);
+    this.sky=new CanvasTexture(skyCanvas);this.sky.colorSpace=SRGBColorSpace;
+    this.scene.background=this.sky;
     this.scene.add(buildGround(),buildRidges(),this.clouds);
     if(!benchmark)this.scene.add(buildFields(),buildMeadowZones());
     this.render();
@@ -35,5 +43,5 @@ export class LandscapeRenderer {
   }
   render() {this.renderer.render(this.scene,this.camera);}
   get stats() {return {drawCalls:this.renderer.info.render.calls,triangles:this.renderer.info.render.triangles,wireframe:this.wire,clouds:this.clouds.visible,benchmark:this.benchmark,frame:this.frame};}
-  dispose(){this.scene.traverse((o:Object3D)=>{if(o instanceof Mesh){o.geometry.dispose();(o.material as MeshBasicMaterial).dispose();}});this.renderer.dispose();}
+  dispose(){this.scene.traverse((o:Object3D)=>{if(o instanceof Mesh){o.geometry.dispose();(o.material as MeshBasicMaterial).dispose();}});this.sky.dispose();this.renderer.dispose();}
 }

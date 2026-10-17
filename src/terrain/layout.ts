@@ -40,13 +40,26 @@ export const RIDGES:RidgeDefinition[]=[
   {id:'horizon-west',name:'极远西岭',atmosphere:.76,points:[p(-1300,4700,-900,180),p(-940,4760,-820,210),p(-780,4730,-785,175),p(-590,4800,-830,180),p(-390,4780,-790,160),p(-170,4820,-880,150)]},
   {id:'horizon-east',name:'极远东岭',atmosphere:.84,points:[p(-200,4880,-920,170),p(80,4820,-860,190),p(300,4860,-885,200),p(530,4800,-845,180),p(730,4900,-880,160),p(1100,4900,-930,170)]},
 ];
-// Preserve the screen silhouette while moving each complete landform away from
-// the meadow: this reveals real valley floor, rather than hiding oversized bases.
+// World-space composition only. The orthographic camera does not shrink distant
+// objects, so author each group's scale and elevation independently of projection.
+// Keep the existing branching landform; allow its silhouette to move in the frame.
+export const RIDGE_PLACEMENTS:Record<string,{u:number;d:number;h:number;scale:number}>={
+  'west-drift':{u:-560,d:3500,h:-485,scale:.50},
+  'middle-saddle':{u:-170,d:3020,h:-385,scale:.50},
+  'near-fold':{u:120,d:2800,h:-350,scale:.61},
+  'east-spur':{u:565,d:2520,h:-280,scale:.57},
+  'quiet-islet':{u:60,d:3920,h:-600,scale:.45},
+  'east-low':{u:470,d:3490,h:-495,scale:.46},
+};
 for(const ridge of RIDGES){
-  const retreat=ridge.id==='near-fold'?400:ridge.id==='middle-saddle'?300:ridge.id==='east-spur'?530:0;
-  if(!retreat)continue;
+  const placement=RIDGE_PLACEMENTS[ridge.id];
+  if(!placement)continue;
+  const anchor={...ridge.points.reduce((a,b)=>a.h>b.h?a:b)};
   for(const point of [ridge.points,...(ridge.branches??[])].flat()){
-    point.d+=retreat;point.h-=retreat*(77/272)/Math.sqrt(1-(77/272)**2);
+    point.u=placement.u+(point.u-anchor.u)*placement.scale;
+    point.d=placement.d+(point.d-anchor.d)*placement.scale;
+    point.h=placement.h+(point.h-anchor.h)*placement.scale;
+    point.w*=placement.scale;
   }
 }
 export interface FieldDefinition {id:string; corners:[number,number][]; color:number; nearBend:number; farBend:number; sideBend:number}

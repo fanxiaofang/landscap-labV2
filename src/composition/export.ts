@@ -1,4 +1,4 @@
-import { drawSky, type LandscapeRenderer } from '../world/renderer';
+import { type LandscapeRenderer } from '../world/renderer';
 import { proxyUrl } from './Proxy';
 import type { CompositionView } from './placements';
 export function loadImage(src:string) {return new Promise<HTMLImageElement>((resolve,reject)=>{const img=new Image();img.onload=()=>resolve(img);img.onerror=()=>reject(new Error('无法载入截图合成资源'));img.src=src;});}
@@ -8,7 +8,8 @@ export async function exportFrame(engine:LandscapeRenderer,view:CompositionView,
     engine.setClouds(clouds);
     const {width,height}=engine.frame,out=document.createElement('canvas');out.width=width;out.height=height;
     const ctx=out.getContext('2d');if(!ctx)throw new Error('无法创建截图画布');
-    drawSky(ctx,width,height);ctx.drawImage(engine.renderer.domElement,0,0);
+    // The WebGL frame already includes the opaque autumn sky seen in preview.
+    ctx.drawImage(engine.renderer.domElement,0,0);
     if(view==='proxy')ctx.drawImage(await loadImage(proxyUrl(engine.frame)),0,0,width,height);
     if(calibration){const text=new XMLSerializer().serializeToString(calibration);const url=URL.createObjectURL(new Blob([text],{type:'image/svg+xml'}));try{ctx.drawImage(await loadImage(url),0,0,width,height);}finally{URL.revokeObjectURL(url);}}
     return out.toDataURL('image/png');
