@@ -27,27 +27,26 @@ function colorize(g:BufferGeometry,color:(p:Vector3,n:Vector3,index:number)=>Col
 }
 function mesh(name:string,g:BufferGeometry) {const m=new Mesh(g,new MeshBasicMaterial({vertexColors:true}));m.name=name;return m;}
 const plan=(v:Vector3)=>({u:(v.x-v.z)*Math.SQRT1_2,d:-(v.x+v.z)*Math.SQRT1_2});
+const groundLight=new Vector3(.4,.8,-.3).normalize();
+function groundColor(u:number,d:number,n:Vector3) {
+  const shoulder=shoulderDepth(u),c=new Color(PALETTE.meadow);
+  const foreground=smooth(-150,-900,d);
+  const sweep=Math.exp(-(((u+300+0.4*d)/850)**2))*foreground;
+  c.lerp(new Color(PALETTE.meadowShade),sweep*.65);
+  c.lerp(new Color(PALETTE.meadowLight),.45*Math.exp(-(((u-70)/400)**2)-((d+180)/500)**2));
+  c.lerp(new Color(PALETTE.shoulder),smooth(shoulder-100,shoulder+750,d));
+  c.lerp(new Color(PALETTE.valley),smooth(shoulder+600,shoulder+1450,d));
+  c.lerp(new Color(PALETTE.farValley),smooth(2600,4300,d));
+  c.multiplyScalar(.82+.18*Math.max(0,n.dot(groundLight)));
+  return c;
+}
 
 export function buildGround() {
   const grid=GROUND_GRID;
   const g=indexedSurface(grid.cols,grid.rows,(s,t)=>{const u=grid.minU+s*grid.width,d=grid.minD+t*grid.depth;return worldPoint(u,d,groundHeight(u,d));});
-  colorize(g,(p,n)=>{
-    const {u,d}=plan(p), shoulder=shoulderDepth(u);
-    const c=new Color(PALETTE.meadow);
-    // Broad, asymmetrical swales; the inhabited footprint stays a quiet solid block.
-    const foreground=smooth(-150,-900,d);
-    const sweep=Math.exp(-(((u+300+0.4*d)/850)**2))*foreground;
-    c.lerp(new Color(PALETTE.meadowShade),sweep*.85);
-    c.lerp(new Color(PALETTE.meadowLight),.55*Math.exp(-(((u-350)/750)**2)-((d+600)/700)**2));
-    c.lerp(new Color(shoulderColor(u,d)),smooth(shoulder-120,shoulder+800,d));
-    c.lerp(new Color(PALETTE.valley),smooth(shoulder+650,shoulder+1400,d));
-    c.lerp(new Color(PALETTE.farValley),smooth(2600,4300,d));
-    c.multiplyScalar(.86+.14*Math.max(0,n.dot(new Vector3(.4,.8,-.3).normalize())));
-    return c;
-  });
+  colorize(g,(p,n)=>{const {u,d}=plan(p);return groundColor(u,d,n);});
   return mesh('continuous-meadow-farm-valley',g);
 }
-function shoulderColor(u:number,d:number) {return d>shoulderDepth(u)+450?'#a0a087':PALETTE.shoulder;}
 
 export function ridgeGeometry(def:RidgeDefinition) {
   const chains=[def.points,...(def.branches??[])];
@@ -65,7 +64,8 @@ export function ridgeGeometry(def:RidgeDefinition) {
       const f=Math.max(0,Math.min(1,((u-a.u)*dx+(d-a.d)/1.5*dz)/(dx*dx+dz*dz)));
       const cu=a.u+f*(b.u-a.u),cd=a.d+f*(b.d-a.d),crest=a.h+f*(b.h-a.h),width=a.w+f*(b.w-a.w);
       const radius=Math.hypot(u-cu,(d-cd)/1.5)/width;
-      const influence=Math.pow(Math.max(0,1-radius),1.45);
+      // A compact smooth apron reaches the valley with a horizontal tangent.
+      const influence=radius<1?(1-radius)*(1-radius)*(1+2*radius):0;
       height=Math.max(height,base+Math.max(0,crest-base)*influence);
     }
     return height;
@@ -112,12 +112,15 @@ export function buildRidges() {
   for(const def of RIDGES){
     const g=ridgeGeometry(def);
     colorize(g,(p,n)=>{
-      const {d}=plan(p);
+      const {u,d}=plan(p);
       const facing=Math.max(0,n.dot(light));
       const c=new Color(PALETTE.ridgeShadow).lerp(new Color(PALETTE.ridgeLight),facing);
       const high=smooth(valleyHeight(0,d)+90,valleyHeight(0,d)+320,p.y);
       c.lerp(new Color(PALETTE.ridgeRock),high*.38);
       c.lerp(new Color(PALETTE.atmosphere),def.atmosphere);
+      // Match the valley at the toes instead of leaving an outlined, isolated mound.
+      const base=groundColor(u,d,new Vector3(0,1,0));
+      c.lerp(base,1-smooth(0,38,p.y-valleyHeight(u,d)));
       return c;
     });
     group.add(mesh(def.id,g));
@@ -128,7 +131,13 @@ export function buildFields() {
   const group=new Group();group.name='conforming-farm-parcels';
   for(const field of FIELDS){
     const g=indexedSurface(48,36,(s,t)=>{const p=fieldPoint(field,s,t);return worldPoint(p.u,p.d,p.h+.8);});
-    colorize(g,()=>new Color(PALETTE.field[field.color]));
+    colorize(g,(_p,n,i)=>{
+      const s=(i%49)/48,t=Math.floor(i/49)/36;
+      const edge=Math.min(s,1-s,t,1-t);
+      const c=new Color(PALETTE.field[field.color]);
+      c.lerp(new Color(PALETTE.meadow),.16*(1-smooth(0,.09,edge)));
+      return c.multiplyScalar(.85+.15*Math.max(0,n.dot(groundLight)));
+    });
     group.add(mesh(field.id,g));
     // Sparse cultivation furrows follow the exact surface sampler; they never float as a flat card.
     for(let k=1;k<8;k++){
@@ -144,9 +153,9 @@ export function buildFields() {
 export function buildMeadowZones() {
   const group=new Group();group.name='meadow-material-zones';
   const patches=[
-    {name:'pasture-back-shoulder',color:'#94a94d',u0:-600,u1:1350,d0:60,d1:-220,width:150,bend:70},
-    {name:'west-shoulder',color:'#7e9744',u0:-1500,u1:1050,d0:-470,d1:-950,width:270,bend:-180},
-    {name:'near-right-bank',color:'#7b9343',u0:-1000,u1:1500,d0:-1000,d1:-730,width:260,bend:-280},
+    {name:'pasture-back-shoulder',color:'#94a94d',u0:-1000,u1:1200,d0:-440,d1:-360,width:130,bend:300},
+    {name:'west-shoulder',color:'#7e9744',u0:-1100,u1:-180,d0:-620,d1:-740,width:190,bend:110},
+    {name:'near-right-bank',color:'#7b9343',u0:-200,u1:1500,d0:-1150,d1:-650,width:270,bend:-180},
     {name:'foreground-fold',color:'#6f8b40',u0:-1400,u1:1200,d0:-1450,d1:-1370,width:300,bend:210},
   ];
   for(const p of patches){
@@ -154,7 +163,7 @@ export function buildMeadowZones() {
       const u=p.u0+(p.u1-p.u0)*s;
       const edge=p.d0+(p.d1-p.d0)*s+p.bend*Math.sin(s*Math.PI);
       const d=edge+(t-.5)*p.width*(.05+.95*Math.sin(s*Math.PI));
-      return worldPoint(u,d,groundHeight(u,d)+1);
+      return worldPoint(u,d,groundHeight(u,d)+.35);
     });
     colorize(g,()=>new Color(p.color));group.add(mesh(p.name,g));
   }

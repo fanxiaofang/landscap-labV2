@@ -12,7 +12,7 @@ export const AUTUMN: EnvironmentState = {
 export const PALETTE = {
   meadow:'#879c43', meadowLight:'#a2b454', meadowShade:'#6b873f',
   shoulder:'#87965b', valley:'#b7b09c', farValley:'#cdb4ae',
-  field:['#c5a14d','#d3af54','#c39b44','#d9b55e'],
+  field:['#b8a458','#c3ae65','#aeb071','#d9b55e'],
   ridgeLight:'#9ba083',ridgeShadow:'#5f776b',ridgeRock:'#a49a91',
   atmosphere:'#c7b4ba',
 };

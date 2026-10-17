@@ -1,0 +1,1008 @@
+{
+  "version": "0.2",
+  "units": "study units, not metres",
+  "cloudSeaRendered": false,
+  "passed": true,
+  "assertions": {
+    "peaksBelowHome": true,
+    "routeDescendsOverall": true,
+    "routeRollingRiseUnder2Degrees": true,
+    "walkRouteUnder12Degrees": true,
+    "routeSlopeStepUnderHalfDegree": true,
+    "noHeightJump": true,
+    "continuousBoundaryDerivative": true,
+    "fieldConformsToGround": true,
+    "fieldsStayAboveRenderedGround": true,
+    "fieldsRemainGentle": true,
+    "validMeshes": true,
+    "projectionMatchesGroundAxes": true,
+    "homeRemainsStable": true,
+    "homeKeepsOriginalScale": true,
+    "allNarrativeAssetsPresent": true
+  },
+  "samples": [
+    {
+      "name": "高架桥与小火车",
+      "u": -465,
+      "d": 880,
+      "elevation": 134.013192,
+      "screen": {
+        "x": 135,
+        "y": 344.1698958272639
+      }
+    },
+    {
+      "name": "拖拉机",
+      "u": -405,
+      "d": 365,
+      "elevation": 184.11305,
+      "screen": {
+        "x": 195,
+        "y": 441.9098703462004
+      }
+    },
+    {
+      "name": "通讯观测台",
+      "u": 340,
+      "d": -18,
+      "elevation": 198.449543,
+      "screen": {
+        "x": 940,
+        "y": 536.5826216000579
+      }
+    },
+    {
+      "name": "蜂箱与生活小设施",
+      "u": -390,
+      "d": -180,
+      "elevation": 212.564602,
+      "screen": {
+        "x": 210,
+        "y": 568.9052494962539
+      }
+    },
+    {
+      "name": "南瓜地",
+      "u": -365,
+      "d": -430,
+      "elevation": 220.13925,
+      "screen": {
+        "x": 235,
+        "y": 632.4125099315877
+      }
+    },
+    {
+      "name": "小木屋",
+      "u": -245,
+      "d": -290,
+      "elevation": 206.571546,
+      "screen": {
+        "x": 355,
+        "y": 605.7928586945268
+      }
+    },
+    {
+      "name": "主屋生活区",
+      "u": 35,
+      "d": -280,
+      "elevation": 200,
+      "screen": {
+        "x": 635,
+        "y": 609.2647058823529
+      }
+    },
+    {
+      "name": "胶囊生活舱",
+      "u": 313,
+      "d": -330,
+      "elevation": 194.704023,
+      "screen": {
+        "x": 913,
+        "y": 628.4984567662096
+      }
+    },
+    {
+      "name": "羊圈",
+      "u": 348,
+      "d": -620,
+      "elevation": 185.966619,
+      "screen": {
+        "x": 948,
+        "y": 718.9740358040493
+      }
+    },
+    {
+      "name": "生活树与散养羊群",
+      "u": 125,
+      "d": -690,
+      "elevation": 199.127137,
+      "screen": {
+        "x": 725,
+        "y": 726.1680399745494
+      }
+    },
+    {
+      "name": "西侧农田路径末端",
+      "u": -470,
+      "d": 690,
+      "elevation": 150.159335,
+      "screen": {
+        "x": 130,
+        "y": 382.4709937771816
+      }
+    },
+    {
+      "name": "中央谷底",
+      "u": 100,
+      "d": 2500,
+      "elevation": -460.287149,
+      "screen": {
+        "x": 700,
+        "y": 455.5567684215839
+      }
+    },
+    {
+      "name": "东侧谷底",
+      "u": 650,
+      "d": 2620,
+      "elevation": -497.684564,
+      "screen": {
+        "x": 1250,
+        "y": 457.4538117741931
+      }
+    }
+  ],
+  "ridges": [
+    {
+      "id": "west-drift",
+      "name": "西侧远肩",
+      "maxElevation": -470,
+      "belowMeadow": true,
+      "clearance": 670,
+      "u": -464.999962,
+      "d": 3239.999956,
+      "screen": {
+        "x": 135.00003788239843,
+        "y": 255.38702284763997
+      }
+    },
+    {
+      "id": "middle-saddle",
+      "name": "中谷低鞍",
+      "maxElevation": -455,
+      "belowMeadow": true,
+      "clearance": 655,
+      "u": -144.999876,
+      "d": 3149.999988,
+      "screen": {
+        "x": 455.00012411737407,
+        "y": 266.4785468077695
+      }
+    },
+    {
+      "id": "near-fold",
+      "name": "谷中折脊",
+      "maxElevation": -485,
+      "belowMeadow": true,
+      "clearance": 685,
+      "u": 180.000108,
+      "d": 3199.999999,
+      "screen": {
+        "x": 780.0001078499365,
+        "y": 281.09694808549364
+      }
+    },
+    {
+      "id": "east-spur",
+      "name": "东侧独立支脊",
+      "maxElevation": -445,
+      "belowMeadow": true,
+      "clearance": 645,
+      "u": 480,
+      "d": 3030.000032,
+      "screen": {
+        "x": 1079.9999998773449,
+        "y": 290.8581841190155
+      }
+    },
+    {
+      "id": "quiet-islet",
+      "name": "远谷偏西余脉",
+      "maxElevation": -600,
+      "belowMeadow": true,
+      "clearance": 800,
+      "u": -119.999957,
+      "d": 3710.000075,
+      "screen": {
+        "x": 480.00004318903666,
+        "y": 247.01772176554732
+      }
+    },
+    {
+      "id": "east-low",
+      "name": "远谷横肩",
+      "maxElevation": -570,
+      "belowMeadow": true,
+      "clearance": 770,
+      "u": 350.000075,
+      "d": 3599.999913,
+      "screen": {
+        "x": 950.0000754377165,
+        "y": 249.38465736282672
+      }
+    },
+    {
+      "id": "horizon-west",
+      "name": "极远西岭",
+      "maxElevation": -710,
+      "belowMeadow": true,
+      "clearance": 910,
+      "u": -570.000054,
+      "d": 4210.00001,
+      "screen": {
+        "x": 29.99994619768688,
+        "y": 210.97394815623886
+      }
+    },
+    {
+      "id": "horizon-east",
+      "name": "极远东岭",
+      "maxElevation": -747.558899,
+      "belowMeadow": true,
+      "clearance": 947.558899,
+      "u": 471.199835,
+      "d": 4229.499998,
+      "screen": {
+        "x": 1071.199835014609,
+        "y": 241.47624049171918
+      }
+    }
+  ],
+  "highestViewingRidge": -445,
+  "composition": {
+    "homeFoot": {
+      "x": 635,
+      "y": 609.2647058823529
+    },
+    "homeScale": 1,
+    "homeMaxSlope": 1.786322,
+    "homeHeightRange": [
+      197.83814724584047,
+      201.4711802944534
+    ],
+    "mainRidgePeak": {
+      "x": 780,
+      "y": 281.096947854012
+    },
+    "assets": [
+      {
+        "id": "yorkshire-railway-viaduct",
+        "u": -465,
+        "d": 880,
+        "h": 134.013192,
+        "scale": 0.72,
+        "screen": {
+          "x": 135,
+          "y": 344.1698958272639
+        }
+      },
+      {
+        "id": "tractor-in-field",
+        "u": -405,
+        "d": 365,
+        "h": 184.11305,
+        "scale": 0.9,
+        "screen": {
+          "x": 195,
+          "y": 441.9098703462004
+        }
+      },
+      {
+        "id": "hilltop-observatory-haven",
+        "u": 340,
+        "d": -18,
+        "h": 198.449543,
+        "scale": 1,
+        "screen": {
+          "x": 940,
+          "y": 536.5826216000579
+        }
+      },
+      {
+        "id": "west-cottage-grounds",
+        "u": -390,
+        "d": -180,
+        "h": 212.564602,
+        "scale": 1,
+        "screen": {
+          "x": 210,
+          "y": 568.9052494962539
+        }
+      },
+      {
+        "id": "cottage-pumpkin-patch",
+        "u": -365,
+        "d": -430,
+        "h": 220.13925,
+        "scale": 1,
+        "screen": {
+          "x": 235,
+          "y": 632.4125099315877
+        }
+      },
+      {
+        "id": "wooden-cabin-cluster",
+        "u": -245,
+        "d": -290,
+        "h": 206.571546,
+        "scale": 1,
+        "screen": {
+          "x": 355,
+          "y": 605.7928586945268
+        }
+      },
+      {
+        "id": "living-cottage-haven",
+        "u": 35,
+        "d": -280,
+        "h": 200,
+        "scale": 1,
+        "screen": {
+          "x": 635,
+          "y": 609.2647058823529
+        }
+      },
+      {
+        "id": "capsule-pod-cluster",
+        "u": 313,
+        "d": -330,
+        "h": 194.704023,
+        "scale": 1,
+        "screen": {
+          "x": 913,
+          "y": 628.4984567662096
+        }
+      },
+      {
+        "id": "yorkshire-sheep-pen-cluster",
+        "u": 348,
+        "d": -620,
+        "h": 185.966619,
+        "scale": 0.92,
+        "screen": {
+          "x": 948,
+          "y": 718.9740358040493
+        }
+      },
+      {
+        "id": "yorkshire-sheep-flock-and-dressing",
+        "u": 125,
+        "d": -690,
+        "h": 199.127137,
+        "scale": 0.94,
+        "screen": {
+          "x": 725,
+          "y": 726.1680399745494
+        }
+      }
+    ]
+  },
+  "route": {
+    "length": 1129.975603,
+    "startElevation": 200,
+    "endElevation": 150.159335,
+    "maxSlopeDegrees": 7.464849,
+    "maxUphillSlopeDegrees": 0.953275,
+    "maxAdjacentSlopeChangeDegrees": 0.047419,
+    "maxUpStep": 0.032891,
+    "sampleCount": 501
+  },
+  "continuity": {
+    "probeEpsilon": 0.001,
+    "maxTwoSidedHeightGap": 0.00204,
+    "maxExtrapolatedLimitGap": 2.5579538487363607e-12,
+    "maxDerivativeGap": 0.000003
+  },
+  "fieldAttachment": {
+    "renderOffset": 0.8,
+    "maxOffsetError": 0.000013,
+    "minRenderedClearance": 0.735317,
+    "maxRenderedClearance": 0.864884,
+    "maxFieldSlopeDegrees": 9.316358
+  },
+  "fieldSamples": [
+    {
+      "id": "lower-plot",
+      "min": 189.36961,
+      "max": 200.217655
+    },
+    {
+      "id": "tractor-plot",
+      "min": 167.834665,
+      "max": 194.627677
+    },
+    {
+      "id": "middle-plot",
+      "min": 143.283645,
+      "max": 182.834806
+    },
+    {
+      "id": "upper-plot",
+      "min": 122.422991,
+      "max": 164.116532
+    }
+  ],
+  "meshReports": {
+    "ground": {
+      "vertices": 41216,
+      "triangles": 81600,
+      "nonFinite": 0,
+      "degenerate": 0,
+      "downwardNormals": 0,
+      "maxNormalError": 0,
+      "minTriangleArea": 435.290682,
+      "maxEdge": 96.223658,
+      "boundaryEdges": 830,
+      "nonManifoldEdges": 0
+    },
+    "west-drift": {
+      "vertices": 237,
+      "triangles": 422,
+      "nonFinite": 0,
+      "degenerate": 0,
+      "downwardNormals": 0,
+      "maxNormalError": 0,
+      "minTriangleArea": 2.754351,
+      "maxEdge": 69.422894,
+      "boundaryEdges": 50,
+      "nonManifoldEdges": 0
+    },
+    "middle-saddle": {
+      "vertices": 166,
+      "triangles": 291,
+      "nonFinite": 0,
+      "degenerate": 0,
+      "downwardNormals": 0,
+      "maxNormalError": 0,
+      "minTriangleArea": 13.629077,
+      "maxEdge": 72.532236,
+      "boundaryEdges": 39,
+      "nonManifoldEdges": 0
+    },
+    "near-fold": {
+      "vertices": 166,
+      "triangles": 289,
+      "nonFinite": 0,
+      "degenerate": 0,
+      "downwardNormals": 0,
+      "maxNormalError": 0,
+      "minTriangleArea": 2.52315,
+      "maxEdge": 61.494709,
+      "boundaryEdges": 41,
+      "nonManifoldEdges": 0
+    },
+    "east-spur": {
+      "vertices": 169,
+      "triangles": 296,
+      "nonFinite": 0,
+      "degenerate": 0,
+      "downwardNormals": 0,
+      "maxNormalError": 0,
+      "minTriangleArea": 15.38385,
+      "maxEdge": 67.759208,
+      "boundaryEdges": 40,
+      "nonManifoldEdges": 0
+    },
+    "quiet-islet": {
+      "vertices": 107,
+      "triangles": 180,
+      "nonFinite": 0,
+      "degenerate": 0,
+      "downwardNormals": 0,
+      "maxNormalError": 0,
+      "minTriangleArea": 13.247883,
+      "maxEdge": 60.516685,
+      "boundaryEdges": 32,
+      "nonManifoldEdges": 0
+    },
+    "east-low": {
+      "vertices": 106,
+      "triangles": 179,
+      "nonFinite": 0,
+      "degenerate": 0,
+      "downwardNormals": 0,
+      "maxNormalError": 0,
+      "minTriangleArea": 16.149438,
+      "maxEdge": 64.020624,
+      "boundaryEdges": 31,
+      "nonManifoldEdges": 0
+    },
+    "horizon-west": {
+      "vertices": 261,
+      "triangles": 449,
+      "nonFinite": 0,
+      "degenerate": 0,
+      "downwardNormals": 0,
+      "maxNormalError": 0,
+      "minTriangleArea": 10.39262,
+      "maxEdge": 55.924525,
+      "boundaryEdges": 71,
+      "nonManifoldEdges": 0
+    },
+    "horizon-east": {
+      "vertices": 189,
+      "triangles": 303,
+      "nonFinite": 0,
+      "degenerate": 0,
+      "downwardNormals": 0,
+      "maxNormalError": 0,
+      "minTriangleArea": 16.687204,
+      "maxEdge": 51.774835,
+      "boundaryEdges": 73,
+      "nonManifoldEdges": 0
+    },
+    "lower-plot": {
+      "vertices": 1813,
+      "triangles": 3456,
+      "nonFinite": 0,
+      "degenerate": 0,
+      "downwardNormals": 0,
+      "maxNormalError": 0,
+      "minTriangleArea": 21.95734,
+      "maxEdge": 15.379258,
+      "boundaryEdges": 168,
+      "nonManifoldEdges": 0
+    },
+    "lower-plot-furrow-1": {
+      "vertices": 98,
+      "triangles": 96,
+      "nonFinite": 0,
+      "degenerate": 0,
+      "downwardNormals": 0,
+      "maxNormalError": 0,
+      "minTriangleArea": 7.985832,
+      "maxEdge": 15.287536,
+      "boundaryEdges": 98,
+      "nonManifoldEdges": 0
+    },
+    "lower-plot-furrow-2": {
+      "vertices": 98,
+      "triangles": 96,
+      "nonFinite": 0,
+      "degenerate": 0,
+      "downwardNormals": 0,
+      "maxNormalError": 0,
+      "minTriangleArea": 8.11123,
+      "maxEdge": 15.185344,
+      "boundaryEdges": 98,
+      "nonManifoldEdges": 0
+    },
+    "lower-plot-furrow-3": {
+      "vertices": 98,
+      "triangles": 96,
+      "nonFinite": 0,
+      "degenerate": 0,
+      "downwardNormals": 0,
+      "maxNormalError": 0,
+      "minTriangleArea": 8.240966,
+      "maxEdge": 15.059552,
+      "boundaryEdges": 98,
+      "nonManifoldEdges": 0
+    },
+    "lower-plot-furrow-4": {
+      "vertices": 98,
+      "triangles": 96,
+      "nonFinite": 0,
+      "degenerate": 0,
+      "downwardNormals": 0,
+      "maxNormalError": 0,
+      "minTriangleArea": 8.346329,
+      "maxEdge": 14.900789,
+      "boundaryEdges": 98,
+      "nonManifoldEdges": 0
+    },
+    "lower-plot-furrow-5": {
+      "vertices": 98,
+      "triangles": 96,
+      "nonFinite": 0,
+      "degenerate": 0,
+      "downwardNormals": 0,
+      "maxNormalError": 0,
+      "minTriangleArea": 8.404834,
+      "maxEdge": 14.705305,
+      "boundaryEdges": 98,
+      "nonManifoldEdges": 0
+    },
+    "lower-plot-furrow-6": {
+      "vertices": 98,
+      "triangles": 96,
+      "nonFinite": 0,
+      "degenerate": 0,
+      "downwardNormals": 0,
+      "maxNormalError": 0,
+      "minTriangleArea": 8.404677,
+      "maxEdge": 14.475441,
+      "boundaryEdges": 98,
+      "nonManifoldEdges": 0
+    },
+    "lower-plot-furrow-7": {
+      "vertices": 98,
+      "triangles": 96,
+      "nonFinite": 0,
+      "degenerate": 0,
+      "downwardNormals": 0,
+      "maxNormalError": 0,
+      "minTriangleArea": 8.349386,
+      "maxEdge": 14.219552,
+      "boundaryEdges": 98,
+      "nonManifoldEdges": 0
+    },
+    "tractor-plot": {
+      "vertices": 1813,
+      "triangles": 3456,
+      "nonFinite": 0,
+      "degenerate": 0,
+      "downwardNormals": 0,
+      "maxNormalError": 0,
+      "minTriangleArea": 25.154177,
+      "maxEdge": 14.521062,
+      "boundaryEdges": 168,
+      "nonManifoldEdges": 0
+    },
+    "tractor-plot-furrow-1": {
+      "vertices": 98,
+      "triangles": 96,
+      "nonFinite": 0,
+      "degenerate": 0,
+      "downwardNormals": 0,
+      "maxNormalError": 0,
+      "minTriangleArea": 9.312889,
+      "maxEdge": 14.265802,
+      "boundaryEdges": 98,
+      "nonManifoldEdges": 0
+    },
+    "tractor-plot-furrow-2": {
+      "vertices": 98,
+      "triangles": 96,
+      "nonFinite": 0,
+      "degenerate": 0,
+      "downwardNormals": 0,
+      "maxNormalError": 0,
+      "minTriangleArea": 9.357631,
+      "maxEdge": 14.121579,
+      "boundaryEdges": 98,
+      "nonManifoldEdges": 0
+    },
+    "tractor-plot-furrow-3": {
+      "vertices": 98,
+      "triangles": 96,
+      "nonFinite": 0,
+      "degenerate": 0,
+      "downwardNormals": 0,
+      "maxNormalError": 0,
+      "minTriangleArea": 9.40831,
+      "maxEdge": 13.950659,
+      "boundaryEdges": 98,
+      "nonManifoldEdges": 0
+    },
+    "tractor-plot-furrow-4": {
+      "vertices": 98,
+      "triangles": 96,
+      "nonFinite": 0,
+      "degenerate": 0,
+      "downwardNormals": 0,
+      "maxNormalError": 0,
+      "minTriangleArea": 9.437613,
+      "maxEdge": 13.744116,
+      "boundaryEdges": 98,
+      "nonManifoldEdges": 0
+    },
+    "tractor-plot-furrow-5": {
+      "vertices": 98,
+      "triangles": 96,
+      "nonFinite": 0,
+      "degenerate": 0,
+      "downwardNormals": 0,
+      "maxNormalError": 0,
+      "minTriangleArea": 9.425724,
+      "maxEdge": 13.498363,
+      "boundaryEdges": 98,
+      "nonManifoldEdges": 0
+    },
+    "tractor-plot-furrow-6": {
+      "vertices": 98,
+      "triangles": 96,
+      "nonFinite": 0,
+      "degenerate": 0,
+      "downwardNormals": 0,
+      "maxNormalError": 0,
+      "minTriangleArea": 9.357487,
+      "maxEdge": 13.21613,
+      "boundaryEdges": 98,
+      "nonManifoldEdges": 0
+    },
+    "tractor-plot-furrow-7": {
+      "vertices": 98,
+      "triangles": 96,
+      "nonFinite": 0,
+      "degenerate": 0,
+      "downwardNormals": 0,
+      "maxNormalError": 0,
+      "minTriangleArea": 9.226974,
+      "maxEdge": 12.905804,
+      "boundaryEdges": 98,
+      "nonManifoldEdges": 0
+    },
+    "middle-plot": {
+      "vertices": 1813,
+      "triangles": 3456,
+      "nonFinite": 0,
+      "degenerate": 0,
+      "downwardNormals": 0,
+      "maxNormalError": 0,
+      "minTriangleArea": 13.112402,
+      "maxEdge": 13.543589,
+      "boundaryEdges": 168,
+      "nonManifoldEdges": 0
+    },
+    "middle-plot-furrow-1": {
+      "vertices": 98,
+      "triangles": 96,
+      "nonFinite": 0,
+      "degenerate": 0,
+      "downwardNormals": 0,
+      "maxNormalError": 0,
+      "minTriangleArea": 6.403339,
+      "maxEdge": 12.718973,
+      "boundaryEdges": 98,
+      "nonManifoldEdges": 0
+    },
+    "middle-plot-furrow-2": {
+      "vertices": 98,
+      "triangles": 96,
+      "nonFinite": 0,
+      "degenerate": 0,
+      "downwardNormals": 0,
+      "maxNormalError": 0,
+      "minTriangleArea": 6.237244,
+      "maxEdge": 12.423653,
+      "boundaryEdges": 98,
+      "nonManifoldEdges": 0
+    },
+    "middle-plot-furrow-3": {
+      "vertices": 98,
+      "triangles": 96,
+      "nonFinite": 0,
+      "degenerate": 0,
+      "downwardNormals": 0,
+      "maxNormalError": 0,
+      "minTriangleArea": 6.011892,
+      "maxEdge": 12.104051,
+      "boundaryEdges": 98,
+      "nonManifoldEdges": 0
+    },
+    "middle-plot-furrow-4": {
+      "vertices": 98,
+      "triangles": 96,
+      "nonFinite": 0,
+      "degenerate": 0,
+      "downwardNormals": 0,
+      "maxNormalError": 0,
+      "minTriangleArea": 5.744751,
+      "maxEdge": 11.751052,
+      "boundaryEdges": 98,
+      "nonManifoldEdges": 0
+    },
+    "middle-plot-furrow-5": {
+      "vertices": 98,
+      "triangles": 96,
+      "nonFinite": 0,
+      "degenerate": 0,
+      "downwardNormals": 0,
+      "maxNormalError": 0,
+      "minTriangleArea": 5.458759,
+      "maxEdge": 11.419787,
+      "boundaryEdges": 98,
+      "nonManifoldEdges": 0
+    },
+    "middle-plot-furrow-6": {
+      "vertices": 98,
+      "triangles": 96,
+      "nonFinite": 0,
+      "degenerate": 0,
+      "downwardNormals": 0,
+      "maxNormalError": 0,
+      "minTriangleArea": 5.176703,
+      "maxEdge": 11.2476,
+      "boundaryEdges": 98,
+      "nonManifoldEdges": 0
+    },
+    "middle-plot-furrow-7": {
+      "vertices": 98,
+      "triangles": 96,
+      "nonFinite": 0,
+      "degenerate": 0,
+      "downwardNormals": 0,
+      "maxNormalError": 0,
+      "minTriangleArea": 4.920221,
+      "maxEdge": 10.998795,
+      "boundaryEdges": 98,
+      "nonManifoldEdges": 0
+    },
+    "upper-plot": {
+      "vertices": 1813,
+      "triangles": 3456,
+      "nonFinite": 0,
+      "degenerate": 0,
+      "downwardNormals": 0,
+      "maxNormalError": 0,
+      "minTriangleArea": 8.957937,
+      "maxEdge": 11.757147,
+      "boundaryEdges": 168,
+      "nonManifoldEdges": 0
+    },
+    "upper-plot-furrow-1": {
+      "vertices": 98,
+      "triangles": 96,
+      "nonFinite": 0,
+      "degenerate": 0,
+      "downwardNormals": 0,
+      "maxNormalError": 0,
+      "minTriangleArea": 4.528704,
+      "maxEdge": 9.942756,
+      "boundaryEdges": 98,
+      "nonManifoldEdges": 0
+    },
+    "upper-plot-furrow-2": {
+      "vertices": 98,
+      "triangles": 96,
+      "nonFinite": 0,
+      "degenerate": 0,
+      "downwardNormals": 0,
+      "maxNormalError": 0,
+      "minTriangleArea": 4.440141,
+      "maxEdge": 9.742996,
+      "boundaryEdges": 98,
+      "nonManifoldEdges": 0
+    },
+    "upper-plot-furrow-3": {
+      "vertices": 98,
+      "triangles": 96,
+      "nonFinite": 0,
+      "degenerate": 0,
+      "downwardNormals": 0,
+      "maxNormalError": 0,
+      "minTriangleArea": 4.280258,
+      "maxEdge": 9.635949,
+      "boundaryEdges": 98,
+      "nonManifoldEdges": 0
+    },
+    "upper-plot-furrow-4": {
+      "vertices": 98,
+      "triangles": 96,
+      "nonFinite": 0,
+      "degenerate": 0,
+      "downwardNormals": 0,
+      "maxNormalError": 0,
+      "minTriangleArea": 4.05259,
+      "maxEdge": 9.589962,
+      "boundaryEdges": 98,
+      "nonManifoldEdges": 0
+    },
+    "upper-plot-furrow-5": {
+      "vertices": 98,
+      "triangles": 96,
+      "nonFinite": 0,
+      "degenerate": 0,
+      "downwardNormals": 0,
+      "maxNormalError": 0,
+      "minTriangleArea": 3.796137,
+      "maxEdge": 9.502596,
+      "boundaryEdges": 98,
+      "nonManifoldEdges": 0
+    },
+    "upper-plot-furrow-6": {
+      "vertices": 98,
+      "triangles": 96,
+      "nonFinite": 0,
+      "degenerate": 0,
+      "downwardNormals": 0,
+      "maxNormalError": 0,
+      "minTriangleArea": 3.552102,
+      "maxEdge": 9.352792,
+      "boundaryEdges": 98,
+      "nonManifoldEdges": 0
+    },
+    "upper-plot-furrow-7": {
+      "vertices": 98,
+      "triangles": 96,
+      "nonFinite": 0,
+      "degenerate": 0,
+      "downwardNormals": 0,
+      "maxNormalError": 0,
+      "minTriangleArea": 3.351308,
+      "maxEdge": 9.128985,
+      "boundaryEdges": 98,
+      "nonManifoldEdges": 0
+    },
+    "pasture-back-shoulder": {
+      "vertices": 1095,
+      "triangles": 2016,
+      "nonFinite": 0,
+      "degenerate": 0,
+      "downwardNormals": 0,
+      "maxNormalError": 0,
+      "minTriangleArea": 7.254027,
+      "maxEdge": 31.561785,
+      "boundaryEdges": 172,
+      "nonManifoldEdges": 0
+    },
+    "west-shoulder": {
+      "vertices": 1095,
+      "triangles": 2016,
+      "nonFinite": 0,
+      "degenerate": 0,
+      "downwardNormals": 0,
+      "maxNormalError": 0,
+      "minTriangleArea": 17.073959,
+      "maxEdge": 46.511957,
+      "boundaryEdges": 172,
+      "nonManifoldEdges": 0
+    },
+    "near-right-bank": {
+      "vertices": 1095,
+      "triangles": 2016,
+      "nonFinite": 0,
+      "degenerate": 0,
+      "downwardNormals": 0,
+      "maxNormalError": 0,
+      "minTriangleArea": 16.118817,
+      "maxEdge": 41.024535,
+      "boundaryEdges": 172,
+      "nonManifoldEdges": 0
+    },
+    "foreground-fold": {
+      "vertices": 1095,
+      "triangles": 2016,
+      "nonFinite": 0,
+      "degenerate": 0,
+      "downwardNormals": 0,
+      "maxNormalError": 0,
+      "minTriangleArea": 19.344696,
+      "maxEdge": 44.043214,
+      "boundaryEdges": 172,
+      "nonManifoldEdges": 0
+    },
+    "farm-access-track": {
+      "vertices": 303,
+      "triangles": 400,
+      "nonFinite": 0,
+      "degenerate": 0,
+      "downwardNormals": 0,
+      "maxNormalError": 0,
+      "minTriangleArea": 13.23754,
+      "maxEdge": 19.790291,
+      "boundaryEdges": 204,
+      "nonManifoldEdges": 0
+    }
+  },
+  "projection": {
+    "azimuthDegrees": 45,
+    "elevationDegrees": 16.44460704375564,
+    "slopes": [
+      0.2830882352941187,
+      -0.2830882352941171
+    ],
+    "anglesDegrees": [
+      15.806193600678524,
+      -15.806193600678437
+    ],
+    "maxSlopeError": 1.0547118733938987e-15
+  },
+  "limitations": [
+    "Open mesh boundaries are intentional, outside the view or buried below the valley floor; no vertical island skirts.",
+    "These checks validate geometry, not artistic approval.",
+    "Static SVG composition does not validate room transitions, interaction, or dynamic parallax.",
+    "Asset contact points are authored ground references; a grouped SVG does not provide individual foot collisions."
+  ]
+}

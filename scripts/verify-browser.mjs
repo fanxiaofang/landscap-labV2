@@ -5,7 +5,7 @@ import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 
 const base=process.env.PREVIEW_URL||'http://127.0.0.1:4180';
-await fs.mkdir('evidence',{recursive:true});
+await fs.mkdir('evidence/v03',{recursive:true});
 const browser=await chromium.launch({headless:true,args:['--use-angle=swiftshader','--enable-unsafe-swiftshader']});
 const errors=[],checks=[];
 const hash=buffer=>createHash('sha256').update(buffer).digest('hex');
@@ -14,64 +14,97 @@ try {
   const page=await browser.newPage({viewport:{width:1440,height:1150},deviceScaleFactor:1});
   page.on('pageerror',e=>errors.push(e.message));
   page.on('console',m=>{if(m.type()==='error')errors.push(m.text());});
+  const formalRequests=[];
+  page.on('request',request=>{if(request.url().endsWith('/reference/live-assets.svg'))formalRequests.push(request.url());});
   await page.goto(base,{waitUntil:'networkidle'});
   await page.waitForFunction(()=>window.landscape?.ready);
-  await page.locator('.asset-overlay').evaluate(img=>img.decode());
-  await page.getByRole('button',{name:'真实资产合成',exact:true}).click();
-  for(const assets of [false,true]){
-    const data=await page.evaluate(assets=>window.landscape.export(assets),assets);
+  assert.equal(await page.evaluate(()=>window.landscape.view()),'terrain');
+  assert.equal(formalRequests.length,0);
+  const exports={};
+  for(const [mode,label,file] of [['terrain','纯地形','01-terrain.png'],['proxy','Proxy 占位','02-proxy.png'],['composite','SVG 对照','03-svg-comparison.png']]){
+    await page.getByRole('button',{name:label,exact:true}).click();
+    assert.equal(await page.locator('.viewport').getAttribute('data-view'),mode);
+    assert.equal(new URL(page.url()).searchParams.get('view'),mode);
+    if(mode==='proxy')await page.locator('.proxy-overlay').evaluate(img=>img.decode());
+    if(mode==='composite')await page.locator('.asset-overlay').evaluate(img=>img.decode());
+    const data=await page.evaluate(()=>window.landscape.export());
+    exports[mode]=data;
+    assert.equal(data,await page.evaluate(mode=>window.landscape.export(mode),mode));
     const buffer=Buffer.from(data.split(',')[1],'base64');
     assert.deepEqual(pngSize(buffer),{width:1200,height:800});
-    const name=assets?'02-real-assets-composite.png':'01-terrain-no-clouds.png';
-    await fs.writeFile('evidence/'+name,buffer);
-    checks.push({name,size:pngSize(buffer),sha256:hash(buffer)});
+    await fs.writeFile('evidence/v03/'+file,buffer);
+    checks.push({name:file,size:pngSize(buffer),sha256:hash(buffer),deterministic:true});
+    if(mode!=='composite')assert.equal(formalRequests.length,0);
   }
-  const a=await page.evaluate(()=>window.landscape.export(false)),b=await page.evaluate(()=>window.landscape.export(false));
-  assert.equal(a,b);checks.push({name:'deterministic export',passed:true});
-  const compositeA=await page.evaluate(()=>window.landscape.export(true)),compositeB=await page.evaluate(()=>window.landscape.export(true));
-  assert.equal(compositeA,compositeB);checks.push({name:'static SVG composite deterministic export',passed:true});
+  assert.equal(formalRequests.length,1);
+  assert.notEqual(exports.terrain,exports.proxy);assert.notEqual(exports.proxy,exports.composite);
+  assert.equal(await page.evaluate(()=>window.landscape.export(false)),exports.terrain);
+  assert.equal(await page.evaluate(()=>window.landscape.export(true)),exports.composite);
+  await fs.writeFile('evidence/01-terrain-no-clouds.png',Buffer.from(exports.terrain.split(',')[1],'base64'));
+  await fs.writeFile('evidence/02-real-assets-composite.png',Buffer.from(exports.composite.split(',')[1],'base64'));
+  checks.push({name:'all modes export distinct frames; SVG loads only for comparison; boolean export remains compatible',passed:true});
+  // A fresh page with the formal asset endpoint unavailable must still render both study modes.
+  const independent=await browser.newPage();let blockedRequests=0;
+  await independent.route('**/reference/live-assets.svg',route=>{blockedRequests++;return route.abort();});
+  await independent.goto(base+'/?view=terrain');
+  await independent.waitForFunction(()=>window.landscape?.ready);
+  assert.equal(await independent.evaluate(()=>window.landscape.export('terrain')),exports.terrain);
+  await independent.getByRole('button',{name:'Proxy 占位',exact:true}).click();
+  await independent.locator('.proxy-overlay').evaluate(img=>img.decode());
+  assert.equal(await independent.evaluate(()=>window.landscape.export('proxy')),exports.proxy);
+  assert.equal(blockedRequests,0);
+  assert.equal(await independent.locator('.asset-overlay').count(),0);
+  await independent.close();
+  checks.push({name:'terrain and Proxy render/export with formal SVG endpoint blocked, without requesting it',passed:true});
+  await page.getByRole('button',{name:'Proxy 占位',exact:true}).click();
   const downloading=page.waitForEvent('download');
   await page.getByRole('button',{name:'导出截图'}).click();
   const download=await downloading;
-  await download.saveAs('evidence/03-button-export.png');
-  assert.deepEqual(pngSize(await fs.readFile('evidence/03-button-export.png')),{width:1200,height:800});
+  await download.saveAs('evidence/v03/button-export.png');
+  assert.equal(hash(await fs.readFile('evidence/v03/button-export.png')),hash(Buffer.from(exports.proxy.split(',')[1],'base64')));
   checks.push({name:'actual screenshot button download',passed:true});
   await page.getByLabel('投影校准',{exact:true}).check();
   const calibration=await page.evaluate(()=>new XMLSerializer().serializeToString(document.querySelector('svg.calibration')));
   assert.ok(calibration.includes('16.445'));
-  await page.locator('.viewport').screenshot({path:'evidence/04-projection-calibration.png'});
+  await page.locator('.viewport').screenshot({path:'evidence/v03/projection-calibration.png'});
   await page.getByLabel('投影校准',{exact:true}).uncheck();
   await page.getByLabel('线框',{exact:true}).check();
   assert.equal((await page.evaluate(()=>window.landscape.stats())).wireframe,true);
   await page.getByLabel('线框',{exact:true}).uncheck();
   assert.equal((await page.evaluate(()=>window.landscape.stats())).wireframe,false);
   checks.push({name:'calibration and wireframe controls',passed:true});
-  await page.screenshot({path:'evidence/05-desktop-review.png',fullPage:true});
-  await page.getByRole('button',{name:'参考对照',exact:true}).click();
+  await page.screenshot({path:'evidence/v03/04-desktop-review.png',fullPage:true});
+  await page.getByLabel('参考对照',{exact:true}).check();
   await page.locator('#reference').selectOption('winter-counterpart.png');
-  assert.equal(await page.evaluate(()=>window.landscape.export(false)),a);
-  await page.locator('#reference').selectOption('autumn-approved.png');
+  assert.equal(await page.evaluate(()=>window.landscape.export('terrain')),exports.terrain);
+  assert.equal(await page.evaluate(()=>window.landscape.view()),'proxy');
+  await page.getByRole('button',{name:'纯地形',exact:true}).click();
+  await page.locator('#reference').selectOption('v02-terrain.png');
   await page.locator('.reference-image img').evaluate(img=>img.decode());
-  await page.screenshot({path:'evidence/06-autumn-comparison.png',fullPage:true});
-  await page.locator('#reference').selectOption('previous-composition.png');
-  await page.locator('.reference-image img').evaluate(img=>img.decode());
-  await page.screenshot({path:'evidence/08-before-after-review.png',fullPage:true});
-  checks.push({name:'reference selection never changes terrain or season',passed:true});
+  const compareBounds=await page.evaluate(()=>{
+    const current=document.querySelector('.viewport').getBoundingClientRect(),reference=document.querySelector('.reference-image').getBoundingClientRect();
+    return {current:{y:current.y,width:current.width,height:current.height},reference:{y:reference.y,width:reference.width,height:reference.height}};
+  });
+  assert.deepEqual(compareBounds.current,compareBounds.reference);
+  await page.screenshot({path:'evidence/v03/05-before-after.png',fullPage:true});
+  await page.getByLabel('参考对照',{exact:true}).uncheck();
+  checks.push({name:'reference selection does not change study mode, terrain or season',passed:true});
   const responsive=[];
-  for(const width of [1440,1024,768,390]){
-    await page.getByRole('button',{name:'真实资产合成',exact:true}).click();
+  for(const [mode,label] of [['proxy','Proxy 占位'],['composite','SVG 对照']])for(const width of [1440,1024,768,390]){
+    await page.getByRole('button',{name:label,exact:true}).click();
     await page.setViewportSize({width,height:900});
-    const metrics=await page.evaluate(()=>{
+    const metrics=await page.evaluate(mode=>{
       const rect=el=>{const b=el.getBoundingClientRect();return {x:b.x,y:b.y,width:b.width,height:b.height};};
-      return {viewport:rect(document.querySelector('.viewport')),canvas:rect(document.querySelector('canvas')),assets:rect(document.querySelector('.asset-overlay')),scrollWidth:document.documentElement.scrollWidth,width:innerWidth};
-    });
+      return {viewport:rect(document.querySelector('.viewport')),canvas:rect(document.querySelector('canvas')),overlay:rect(document.querySelector(mode==='proxy'?'.proxy-overlay':'.asset-overlay')),scrollWidth:document.documentElement.scrollWidth,width:innerWidth};
+    },mode);
     assert.ok(Math.abs(metrics.viewport.width/metrics.viewport.height-1.5)<.001);
-    assert.deepEqual(metrics.canvas,metrics.assets);
+    assert.deepEqual(metrics.canvas,metrics.overlay);
     assert.ok(metrics.scrollWidth<=width);
-    responsive.push({width,...metrics});
+    responsive.push({mode,...metrics});
   }
-  await page.screenshot({path:'evidence/07-mobile-review.png',fullPage:true});
-  checks.push({name:'responsive layout and synchronized SVG/Canvas bounds',passed:true,sizes:responsive});
+  await page.getByRole('button',{name:'Proxy 占位',exact:true}).click();
+  await page.screenshot({path:'evidence/v03/06-mobile-review.png',fullPage:true});
+  checks.push({name:'responsive layout and synchronized overlays/Canvas bounds',passed:true,sizes:responsive});
 
   // Re-open the actual preserved SVG, then compare its CTMs and bounds to live DOM provenance.
   const provenance=JSON.parse(await fs.readFile('public/reference/provenance.json','utf8'));
@@ -125,12 +158,13 @@ try {
   const house=relocationReport.find(p=>p.id==='living-cottage-haven');
   assert.equal(house.scale,1);
   assert.ok(Math.abs(house.bounds.width-422.4)<1);
-  await fs.writeFile('evidence/asset-placement.json',JSON.stringify({version:'0.2',sourcePreservation,passed:true,assets:relocationReport},null,2));
+  await fs.writeFile('evidence/asset-placement.json',JSON.stringify({version:'0.3',sourcePreservation,passed:true,assets:relocationReport},null,2));
   checks.push({name:'all ten original SVG groups preserved, placed on terrain and visible; house retains original size',passed:true,maxMatrixError:Math.max(...relocationReport.map(p=>p.matrixError))});
   const stats=await page.evaluate(()=>window.landscape.stats());
   assert.equal(errors.length,0,errors.join('\n'));
-  const report={version:'0.2',passed:true,url:base,browser:browser.version(),renderer:'Chromium WebGL / SwiftShader software renderer, not a hardware performance benchmark',consoleErrors:errors,stats,checks,artApproval:'PENDING REVIEW. Engineering checks do not assert artistic acceptance.'};
+  const report={version:'0.3',passed:true,url:base,browser:browser.version(),renderer:'Chromium WebGL / SwiftShader software renderer, not a hardware performance benchmark',consoleErrors:errors,stats,checks,artApproval:'PENDING REVIEW. Engineering checks do not assert artistic acceptance.'};
   await fs.writeFile('evidence/browser-report.json',JSON.stringify(report,null,2));
+  await fs.writeFile('evidence/v03/browser-report.json',JSON.stringify(report,null,2));
   console.log(JSON.stringify({passed:true,consoleErrors:errors,stats,maxMatrixError,maxBoundsError,checks:checks.length},null,2));
 } catch(error) {
   await fs.writeFile('evidence/browser-report.json',JSON.stringify({passed:false,consoleErrors:errors,checks,error:String(error)},null,2));

@@ -1,38 +1,49 @@
 {
-  "version": "0.2",
+  "version": "0.3",
   "passed": true,
   "url": "http://127.0.0.1:4180",
   "browser": "141.0.7390.37",
   "renderer": "Chromium WebGL / SwiftShader software renderer, not a hardware performance benchmark",
   "consoleErrors": [],
   "stats": {
-    "drawCalls": 46,
-    "triangles": 108985,
+    "drawCalls": 38,
+    "triangles": 105671,
     "wireframe": false
   },
   "checks": [
     {
-      "name": "01-terrain-no-clouds.png",
+      "name": "01-terrain.png",
       "size": {
         "width": 1200,
         "height": 800
       },
-      "sha256": "fab0d5eb29b6387ae0ab2bef2925c9c973230a3ab922db2071882835efbfd496"
+      "sha256": "30d70711751a503d1644f0824280482919aa8f58b7c64668dc3fbf5cfd00df29",
+      "deterministic": true
     },
     {
-      "name": "02-real-assets-composite.png",
+      "name": "02-proxy.png",
       "size": {
         "width": 1200,
         "height": 800
       },
-      "sha256": "4bb6c3b5d0d82d421dcfefd9a52580e9013c394c119c155d4e3c4b50abc84b6d"
+      "sha256": "3fe1c9b1a7a808f39636210dfe572585f9ee488239c5fde45180947839349f70",
+      "deterministic": true
     },
     {
-      "name": "deterministic export",
+      "name": "03-svg-comparison.png",
+      "size": {
+        "width": 1200,
+        "height": 800
+      },
+      "sha256": "5b7f93c445327f58efbbddb06687c8761a94dc92a15cd7f0e70e0131ae124e12",
+      "deterministic": true
+    },
+    {
+      "name": "all modes export distinct frames; SVG loads only for comparison; boolean export remains compatible",
       "passed": true
     },
     {
-      "name": "static SVG composite deterministic export",
+      "name": "terrain and Proxy render/export with formal SVG endpoint blocked, without requesting it",
       "passed": true
     },
     {
@@ -44,15 +55,15 @@
       "passed": true
     },
     {
-      "name": "reference selection never changes terrain or season",
+      "name": "reference selection does not change study mode, terrain or season",
       "passed": true
     },
     {
-      "name": "responsive layout and synchronized SVG/Canvas bounds",
+      "name": "responsive layout and synchronized overlays/Canvas bounds",
       "passed": true,
       "sizes": [
         {
-          "width": 1440,
+          "mode": "proxy",
           "viewport": {
             "x": 36,
             "y": 236.5,
@@ -65,16 +76,17 @@
             "width": 1368,
             "height": 912
           },
-          "assets": {
+          "overlay": {
             "x": 36,
             "y": 236.5,
             "width": 1368,
             "height": 912
           },
-          "scrollWidth": 1440
+          "scrollWidth": 1440,
+          "width": 1440
         },
         {
-          "width": 1024,
+          "mode": "proxy",
           "viewport": {
             "x": 36,
             "y": 236.5,
@@ -87,16 +99,17 @@
             "width": 952,
             "height": 634.65625
           },
-          "assets": {
+          "overlay": {
             "x": 36,
             "y": 236.5,
             "width": 952,
             "height": 634.65625
           },
-          "scrollWidth": 1024
+          "scrollWidth": 1024,
+          "width": 1024
         },
         {
-          "width": 768,
+          "mode": "proxy",
           "viewport": {
             "x": 36,
             "y": 236.5,
@@ -109,16 +122,17 @@
             "width": 696,
             "height": 464
           },
-          "assets": {
+          "overlay": {
             "x": 36,
             "y": 236.5,
             "width": 696,
             "height": 464
           },
-          "scrollWidth": 768
+          "scrollWidth": 768,
+          "width": 768
         },
         {
-          "width": 390,
+          "mode": "proxy",
           "viewport": {
             "x": 16,
             "y": 260,
@@ -131,13 +145,106 @@
             "width": 358,
             "height": 238.65625
           },
-          "assets": {
+          "overlay": {
             "x": 16,
             "y": 260,
             "width": 358,
             "height": 238.65625
           },
-          "scrollWidth": 390
+          "scrollWidth": 390,
+          "width": 390
+        },
+        {
+          "mode": "composite",
+          "viewport": {
+            "x": 36,
+            "y": 236.5,
+            "width": 1368,
+            "height": 912
+          },
+          "canvas": {
+            "x": 36,
+            "y": 236.5,
+            "width": 1368,
+            "height": 912
+          },
+          "overlay": {
+            "x": 36,
+            "y": 236.5,
+            "width": 1368,
+            "height": 912
+          },
+          "scrollWidth": 1440,
+          "width": 1440
+        },
+        {
+          "mode": "composite",
+          "viewport": {
+            "x": 36,
+            "y": 236.5,
+            "width": 952,
+            "height": 634.65625
+          },
+          "canvas": {
+            "x": 36,
+            "y": 236.5,
+            "width": 952,
+            "height": 634.65625
+          },
+          "overlay": {
+            "x": 36,
+            "y": 236.5,
+            "width": 952,
+            "height": 634.65625
+          },
+          "scrollWidth": 1024,
+          "width": 1024
+        },
+        {
+          "mode": "composite",
+          "viewport": {
+            "x": 36,
+            "y": 236.5,
+            "width": 696,
+            "height": 464
+          },
+          "canvas": {
+            "x": 36,
+            "y": 236.5,
+            "width": 696,
+            "height": 464
+          },
+          "overlay": {
+            "x": 36,
+            "y": 236.5,
+            "width": 696,
+            "height": 464
+          },
+          "scrollWidth": 768,
+          "width": 768
+        },
+        {
+          "mode": "composite",
+          "viewport": {
+            "x": 16,
+            "y": 260,
+            "width": 358,
+            "height": 238.65625
+          },
+          "canvas": {
+            "x": 16,
+            "y": 260,
+            "width": 358,
+            "height": 238.65625
+          },
+          "overlay": {
+            "x": 16,
+            "y": 260,
+            "width": 358,
+            "height": 238.65625
+          },
+          "scrollWidth": 390,
+          "width": 390
         }
       ]
     },
@@ -205,7 +312,7 @@
     {
       "name": "all ten original SVG groups preserved, placed on terrain and visible; house retains original size",
       "passed": true,
-      "maxMatrixError": 0.000015388151950901374
+      "maxMatrixError": 0.0000160984060357805
     }
   ],
   "artApproval": "PENDING REVIEW. Engineering checks do not assert artistic acceptance."
