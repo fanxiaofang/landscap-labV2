@@ -1,86 +1,72 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import { LandscapeRenderer } from './world/renderer';
+import { FRAME, INTEGRATION_FRAME } from './world/projection';
 import { Calibration } from './composition/Calibration';
+import { ContourGuides, REFERENCE_BANDS } from './composition/Contours';
 import { downloadUrl, exportFrame } from './composition/export';
-import { measureProjection } from './world/projection';
-import { assetLayout, loadAssetComposition } from './composition/assets';
 import { Proxy, proxySvg } from './composition/Proxy';
 import { sceneLayout, type CompositionView } from './composition/placements';
 import './style.css';
 
-declare global {interface Window { landscape?: {export:(view?:CompositionView|boolean)=>Promise<string>;stats:()=>unknown;ready:boolean;assets:typeof assetLayout;placements:typeof sceneLayout;assetSvg:()=>Promise<string>;proxySvg:typeof proxySvg;view:()=>CompositionView;setView:(view:CompositionView)=>void} }}
-type Reference='autumn-approved.png'|'live-overview.png'|'winter-counterpart.png'|'previous-composition.png'|'v02-terrain.png';
-const VIEW_LABELS:Record<CompositionView,string>={terrain:'纯地形',proxy:'Proxy 占位',composite:'SVG 对照'};
-const VIEW_CAPTIONS:Record<CompositionView,string>={terrain:'独立地形 · 无资产',proxy:'通用体块与占地范围 · 随地形布局',composite:'正式 SVG 对照 · 共用地形布局'};
-const VIEW_NOTES:Record<CompositionView,string>={terrain:'先观察草甸、农田与谷地的连续关系，再切换 Proxy 检查生活区尺度。',proxy:'体块仅表示占地、体量与叙事位置。正式 SVG 可单独切换对照。',composite:'正式 SVG 适配当前布局；地形与占位布局独立于原始资产坐标。'};
-
+declare global {interface Window {landscape?:{export:(view?:CompositionView,clouds?:boolean)=>Promise<string>;stats:()=>unknown;ready:boolean;placements:typeof sceneLayout;proxySvg:typeof proxySvg;view:()=>CompositionView;setView:(view:CompositionView)=>void;setClouds:(enabled:boolean)=>void}}}
+const params=new URLSearchParams(location.search);
+const integration=params.get('frame')==='integration';
+const frame=integration?INTEGRATION_FRAME:FRAME;
+const labels:Record<CompositionView,string>={terrain:'纯地形',proxy:'Proxy 占位'};
 export default function App() {
-  const params=new URLSearchParams(location.search);
   const capture=params.get('capture')==='1';
-  const initial=params.get('view');
-  const [view,setView]=useState<CompositionView>(initial==='proxy'||initial==='composite'?initial:'terrain');
-  const viewRef=useRef(view);viewRef.current=view;
-  const [compare,setCompare]=useState(false);
+  const [view,setView]=useState<CompositionView>(params.get('view')==='proxy'?'proxy':'terrain');
+  const [clouds,setClouds]=useState(params.get('clouds')==='1');
+  const [compare,setCompare]=useState(!integration),[comparison,setComparison]=useState('side');
+  const [mix,setMix]=useState(50),[guides,setGuides]=useState(false);
   const [calibrate,setCalibrate]=useState(false),[wire,setWire]=useState(false);
-  const [reference,setReference]=useState<Reference>('v02-terrain.png');
-  const [ready,setReady]=useState(false),[assetReady,setAssetReady]=useState(false),[error,setError]=useState('');
-  const [exporting,setExporting]=useState(false),[status,setStatus]=useState('');
-  const [assetUrl,setAssetUrl]=useState('');
+  const [ready,setReady]=useState(false),[error,setError]=useState(''),[exporting,setExporting]=useState(false),[status,setStatus]=useState('');
+  const viewRef=useRef(view);viewRef.current=view;
+  const cloudsRef=useRef(clouds);cloudsRef.current=clouds;
   const canvas=useRef<HTMLCanvasElement>(null),engine=useRef<LandscapeRenderer|null>(null);
-  const [report,setReport]=useState<any>(null);
-  const projection=measureProjection();
   useEffect(()=>{
-    try{
-      const e=new LandscapeRenderer(canvas.current!);engine.current=e;setReady(true);
-      window.landscape={ready:true,export:(mode=viewRef.current)=>exportFrame(e,mode),stats:()=>e.stats,assets:assetLayout,placements:sceneLayout,assetSvg:async()=>(await loadAssetComposition()).svg,proxySvg,view:()=>viewRef.current,setView};
+    try {
+      const e=new LandscapeRenderer(canvas.current!,frame);engine.current=e;e.setClouds(cloudsRef.current);setReady(true);
+      window.landscape={ready:true,export:(mode=viewRef.current,cloud=cloudsRef.current)=>exportFrame(e,mode,cloud),stats:()=>e.stats,placements:sceneLayout,proxySvg,view:()=>viewRef.current,setView,setClouds};
       return ()=>{delete window.landscape;engine.current=null;e.dispose();};
-    }catch(err){setError(`Three.js 初始化失败：${String(err)}`);}
+    }catch(err){setError(`地形初始化失败：${String(err)}`);}
   },[]);
-  useEffect(()=>{
-    const url=new URL(location.href);url.searchParams.set('view',view);history.replaceState(null,'',url);
-    if(view!=='composite')return;
-    let active=true;
-    loadAssetComposition().then(({url})=>{if(active)setAssetUrl(url);}).catch(err=>{if(active)setError(String(err));});
-    return ()=>{active=false;};
-  },[view]);
+  useEffect(()=>{engine.current?.setClouds(clouds);const url=new URL(location.href);url.searchParams.set('view',view);url.searchParams.set('clouds',clouds?'1':'0');history.replaceState(null,'',url);},[clouds,view]);
   useEffect(()=>{engine.current?.setWireframe(wire);},[wire]);
-  useEffect(()=>{fetch('/geometry-report.json').then(r=>{if(!r.ok)throw new Error('暂无检查报告');return r.json();}).then(setReport).catch(()=>setReport(null));},[]);
   async function save() {
-    if(!engine.current)return;
-    setExporting(true);setStatus('');
-    try{
-      const src=await exportFrame(engine.current,view,calibrate?document.querySelector<SVGSVGElement>('svg.calibration'):null);
-      downloadUrl(src,`landscape-v03-${view}${calibrate?'-calibrated':''}.png`);
-      setStatus('已导出 1200 × 800 PNG');
-    }catch(e){setError(String(e));}finally{setExporting(false);}
+    if(!engine.current)return;setExporting(true);setStatus('');
+    try{const src=await exportFrame(engine.current,view,clouds,calibrate?document.querySelector<SVGSVGElement>('svg.calibration'):null);downloadUrl(src,`landscape-v04-${view}-${clouds?'clouds':'clear'}-${frame.width}x${frame.height}.png`);setStatus(`已导出 ${frame.width} × ${frame.height} PNG`);}catch(e){setError(String(e));}finally{setExporting(false);}
   }
-  const showAssets=view==='composite';
-  return <main className={capture?'app capture':'app'}>
+  const aligned=compare&&!integration,overlay=aligned&&comparison!=='side';
+  const frameStyle={'--frame-ratio':`${frame.width} / ${frame.height}`,'--frame-width':`${frame.width}px`,'--frame-height':`${frame.height}px`} as CSSProperties;
+  return <main className={`app ${capture?'capture':''}`} style={frameStyle}>
     {!capture&&<>
-      <header className="app-header"><a className="wordmark" href="/">Live With Me <span>/</span> <strong>Landscape</strong></a><span className="version">V0.3 · 地形与占位布局</span><span className="review-state">构图待审阅</span></header>
-      <div className="workspace-heading"><div><h1>高处的家园，低处的群山</h1><p>高地草甸 / 缓坡农田 / 开阔谷地 · 无云海</p></div><button className="primary" onClick={save} disabled={!ready||exporting||(showAssets&&!assetReady)}>{exporting?'正在导出…':'导出截图'}<span aria-hidden="true">↗</span></button></div>
-      <div className="toolbar"><div className="view-switch" role="group" aria-label="预览模式">{(['terrain','proxy','composite'] as CompositionView[]).map(mode=><button key={mode} aria-pressed={view===mode} onClick={()=>{setView(mode);setStatus('');}}>{VIEW_LABELS[mode]}</button>)}</div><div className="debug-controls"><label><input type="checkbox" checked={compare} onChange={e=>setCompare(e.target.checked)}/>参考对照</label><label><input type="checkbox" checked={calibrate} onChange={e=>setCalibrate(e.target.checked)}/>投影校准</label><label><input type="checkbox" checked={wire} onChange={e=>setWire(e.target.checked)}/>线框</label></div></div>
+      <header className="app-header"><a className="wordmark" href="/">Live With Me <span>/</span> <strong>Landscape</strong></a><span className="version">V0.4 · 秋季构图研究</span><span className="review-state">美术待审阅</span></header>
+      <div className="workspace-heading"><div><h1>以秋季定稿图校准空间</h1><p>{integration?'1200 × 800 · SVG 集成兼容性画幅，仅显示 Proxy':'1600 × 900 · 斜向前景 / 谷地留白 / 分散露峰'}</p></div><button className="primary" onClick={save} disabled={!ready||exporting}>{exporting?'正在导出…':'导出截图'}<span aria-hidden="true">↗</span></button></div>
+      <div className="toolbar"><div className="view-switch" role="group" aria-label="预览模式">{(['terrain','proxy'] as CompositionView[]).map(mode=><button key={mode} aria-pressed={view===mode} onClick={()=>setView(mode)}>{labels[mode]}</button>)}</div><div className="debug-controls"><label><input type="checkbox" checked={clouds} onChange={e=>setClouds(e.target.checked)}/>静态云海</label><label><input type="checkbox" checked={calibrate} onChange={e=>setCalibrate(e.target.checked)}/>投影校准</label><label><input type="checkbox" checked={wire} onChange={e=>setWire(e.target.checked)}/>线框</label></div></div>
+      {!integration&&<div className="comparison-controls"><label><input type="checkbox" checked={compare} onChange={e=>setCompare(e.target.checked)}/>秋季定稿对照</label>{compare&&<><label>比较方式<select aria-label="比较方式" value={comparison} onChange={e=>setComparison(e.target.value)}><option value="side">并排同尺度</option><option value="overlay">透明叠图</option><option value="wipe">左右擦拭</option></select></label><label><input type="checkbox" checked={guides} onChange={e=>setGuides(e.target.checked)}/>构图轮廓</label>{overlay&&<label className="mix-control">{comparison==='overlay'?'定稿透明度':'定稿覆盖范围'}<input aria-label="对照比例" type="range" min="0" max="100" value={mix} onChange={e=>setMix(+e.target.value)}/><output>{mix}%</output></label>}</>}</div>}
     </>}
     {error&&<p className="error" role="alert">{error}</p>}
-    <div className={`preview-layout ${compare?'comparing':''}`}>
-      <section className="viewport-panel" aria-label="Three.js 秋季地形预览">
-        {compare&&!capture&&<div className="comparison-heading">当前 V0.3 · {VIEW_LABELS[view]}</div>}
-        <div className="viewport" data-testid="viewport" data-view={view}>
-          <canvas ref={canvas} width="1200" height="800" aria-label="无云海三维地形"/>
-          {view==='proxy'&&<Proxy/>}
-          {showAssets&&assetUrl&&<img className="asset-overlay visible" src={assetUrl} alt="正式 Live With Me SVG 对照，按通用生活区与农田布局定位" onLoad={()=>setAssetReady(true)} onError={()=>setError('场景资产载入失败，请刷新重试。')}/>}
-          {calibrate&&<Calibration/>}
+    <div className={`preview-layout ${aligned&&comparison==='side'?'comparing':''}`}>
+      <section className="viewport-panel" aria-label="当前构图">
+        {!capture&&<div className="comparison-heading">当前 V0.4 · {labels[view]} · {clouds?'静态云海占位':'无云海几何检查'}</div>}
+        <div className="viewport" data-testid="viewport" data-view={view} data-clouds={clouds}>
+          <canvas ref={canvas} width={frame.width} height={frame.height} aria-label={clouds?'静态云海地形预览':'无云海三维地形'}/>
+          {view==='proxy'&&<Proxy frame={frame}/>}
+          {calibrate&&<Calibration frame={frame}/>}
+          {overlay&&!capture&&<img className="reference-overlay" src="/reference/autumn-approved.png" alt="秋季定稿叠图" style={comparison==='overlay'?{opacity:mix/100}:{clipPath:`inset(0 ${100-mix}% 0 0)`}}/>}
+          {overlay&&comparison==='wipe'&&!capture&&<span className="wipe-divider" style={{left:`${mix}%`}}/>}
+          {aligned&&guides&&!capture&&<ContourGuides/>}
           {!ready&&!error&&<div className="loading">正在建立地形…</div>}
-          {ready&&showAssets&&!assetReady&&!error&&<div className="overlay-status" role="status">正在载入 SVG 对照…</div>}
         </div>
-        {!capture&&<div className="viewport-caption"><span><i/>{VIEW_CAPTIONS[view]}</span><span>秋季 / 无云海 / 固定正交</span></div>}
+        {!capture&&<div className="viewport-caption"><span><i/>{clouds?'静态网格云层，仅检验构图':'云层完全关闭，检查真实谷地与山脚'}</span><span>{frame.width} × {frame.height}</span></div>}
       </section>
-      {compare&&!capture&&<aside className="reference-panel"><div className="reference-heading"><label htmlFor="reference">对照基准</label><select id="reference" value={reference} onChange={e=>setReference(e.target.value as Reference)}><option value="v02-terrain.png">V0.2 纯地形</option><option value="autumn-approved.png">秋季定稿图</option><option value="previous-composition.png">V0.1 旧构图</option><option value="live-overview.png">真实 Overview 截图</option><option value="winter-counterpart.png">冬季参考图</option></select></div><div className="reference-image"><img src={'/reference/'+reference} alt={reference==='v02-terrain.png'?'调整前的 V0.2 纯地形':reference==='previous-composition.png'?'调整前的 V0.1 无云海构图':reference==='autumn-approved.png'?'秋季正式目标图':reference==='live-overview.png'?'真实正式项目 Overview':'冬季季节参考，不改变地形'}/></div><p>{reference==='v02-terrain.png'?'同一正交画幅，比较农田与主屋草甸的视觉高低、草甸起伏和山谷留白。':reference==='previous-composition.png'?'同一画幅的旧版，比较草甸边缘、田块走向与山群间距。':reference==='live-overview.png'?'正式源码运行后的静态参考，黄昏主题，1200 × 800。':'完整保留参考图比例；上下留白用于比较，不裁切、不拉伸。'}</p></aside>}
+      {aligned&&comparison==='side'&&!capture&&<aside className="reference-panel"><div className="comparison-heading">秋季定稿图 · 唯一主要美术基准</div><div className="reference-image"><img src="/reference/autumn-approved.png" alt="秋季定稿图"/>{guides&&<ContourGuides/>}</div><p>完整原图等比适配 16:9，不裁切、不拉伸；两侧画框大小和位置基线一致。</p></aside>}
     </div>
     {!capture&&<>
-      <div className="status-line" role="status"><span>{status||VIEW_NOTES[view]}</span><a href="/reference/provenance.json" target="_blank" rel="noreferrer">查看来源记录 ↗</a></div>
-      <details className="checks"><summary><span>空间与投影检查</span><span>{report?.passed?'几何检查通过':'检查报告待生成'} · 构图待审阅</span></summary><div className="checks-body"><dl><div><dt>主屋草甸</dt><dd>+200.0 <small>研究单位</small></dd></div><div><dt>最高观景山脊</dt><dd>{report?.highestViewingRidge?.toFixed(1)??'—'} <small>低于草甸</small></dd></div><div><dt>下行路径最大坡度</dt><dd>{report?.route?.maxSlopeDegrees?.toFixed(2)??'—'}°</dd></div><div><dt>地面轴 / 相机仰角</dt><dd>±15.806° / {projection.elevationDegrees.toFixed(3)}°</dd></div></dl><p>当前无云海；主屋平台稳定，外围草甸允许温和起伏。场景单位不是米。</p><a href="/geometry-report.json" target="_blank" rel="noreferrer">查看完整采样结果 ↗</a></div></details>
-      <footer><span>Landscape V2 · 当前仓库持续迭代</span><span>先验证空间，再增加环境细节。</span></footer>
+      <div className="status-line" role="status"><span>{status||'轮廓线为定稿图人工标注；几何检查通过不代表美术构图通过。'}</span><a href={integration?'/?view=proxy':'/?frame=integration&view=proxy'}>{integration?'返回 16:9 构图审阅':'1200 × 800 兼容性检查'} ↗</a></div>
+      <details className="checks"><summary><span>本轮审阅范围与画面占比</span><span>完成出图后暂停，等待审阅</span></summary><div className="checks-body"><p>定稿图人工轮廓估算：天空约 {(REFERENCE_BANDS.sky*100).toFixed(1)}%，前景约 {(REFERENCE_BANDS.foreground*100).toFixed(1)}%，其间谷地与山群约 {(REFERENCE_BANDS.valleyAndMountains*100).toFixed(1)}%。这些比例用于构图比较，不是自动验收阈值。</p><p>重点检查前景斜切、谷地留白、山脚遮挡、中央与右侧露峰。静态云层无粒子、动画或复杂 Shader。本轮始终使用 Proxy，正式 SVG 未接入。</p><a href="/geometry-report.json" target="_blank" rel="noreferrer">查看工程采样报告 ↗</a></div></details>
+      <footer><span>参考：01_autumn_approved.png.png / autumn-approved.png</span><span>视觉状态：待作者审阅</span></footer>
     </>}
   </main>;
 }

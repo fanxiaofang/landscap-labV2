@@ -2,171 +2,98 @@ import { chromium } from '@playwright/test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import { createHash } from 'node:crypto';
-import { execFileSync } from 'node:child_process';
-
 const base=process.env.PREVIEW_URL||'http://127.0.0.1:4180';
-await fs.mkdir('evidence/v03',{recursive:true});
+const folder='evidence/v04';await fs.mkdir(folder,{recursive:true});
 const browser=await chromium.launch({headless:true,args:['--use-angle=swiftshader','--enable-unsafe-swiftshader']});
 const errors=[],checks=[];
-const hash=buffer=>createHash('sha256').update(buffer).digest('hex');
-const pngSize=buffer=>({width:buffer.readUInt32BE(16),height:buffer.readUInt32BE(20)});
+const hash=b=>createHash('sha256').update(b).digest('hex');
+const png=data=>Buffer.from(data.split(',')[1],'base64');
+const size=b=>({width:b.readUInt32BE(16),height:b.readUInt32BE(20)});
 try {
-  const page=await browser.newPage({viewport:{width:1440,height:1150},deviceScaleFactor:1});
-  page.on('pageerror',e=>errors.push(e.message));
-  page.on('console',m=>{if(m.type()==='error')errors.push(m.text());});
-  const formalRequests=[];
-  page.on('request',request=>{if(request.url().endsWith('/reference/live-assets.svg'))formalRequests.push(request.url());});
-  await page.goto(base,{waitUntil:'networkidle'});
-  await page.waitForFunction(()=>window.landscape?.ready);
-  assert.equal(await page.evaluate(()=>window.landscape.view()),'terrain');
-  assert.equal(formalRequests.length,0);
-  const exports={};
-  for(const [mode,label,file] of [['terrain','纯地形','01-terrain.png'],['proxy','Proxy 占位','02-proxy.png'],['composite','SVG 对照','03-svg-comparison.png']]){
-    await page.getByRole('button',{name:label,exact:true}).click();
-    assert.equal(await page.locator('.viewport').getAttribute('data-view'),mode);
-    assert.equal(new URL(page.url()).searchParams.get('view'),mode);
-    if(mode==='proxy')await page.locator('.proxy-overlay').evaluate(img=>img.decode());
-    if(mode==='composite')await page.locator('.asset-overlay').evaluate(img=>img.decode());
-    const data=await page.evaluate(()=>window.landscape.export());
-    exports[mode]=data;
-    assert.equal(data,await page.evaluate(mode=>window.landscape.export(mode),mode));
-    const buffer=Buffer.from(data.split(',')[1],'base64');
-    assert.deepEqual(pngSize(buffer),{width:1200,height:800});
-    await fs.writeFile('evidence/v03/'+file,buffer);
-    checks.push({name:file,size:pngSize(buffer),sha256:hash(buffer),deterministic:true});
-    if(mode!=='composite')assert.equal(formalRequests.length,0);
-  }
-  assert.equal(formalRequests.length,1);
-  assert.notEqual(exports.terrain,exports.proxy);assert.notEqual(exports.proxy,exports.composite);
-  assert.equal(await page.evaluate(()=>window.landscape.export(false)),exports.terrain);
-  assert.equal(await page.evaluate(()=>window.landscape.export(true)),exports.composite);
-  await fs.writeFile('evidence/01-terrain-no-clouds.png',Buffer.from(exports.terrain.split(',')[1],'base64'));
-  await fs.writeFile('evidence/02-real-assets-composite.png',Buffer.from(exports.composite.split(',')[1],'base64'));
-  checks.push({name:'all modes export distinct frames; SVG loads only for comparison; boolean export remains compatible',passed:true});
-  // A fresh page with the formal asset endpoint unavailable must still render both study modes.
-  const independent=await browser.newPage();let blockedRequests=0;
-  await independent.route('**/reference/live-assets.svg',route=>{blockedRequests++;return route.abort();});
-  await independent.goto(base+'/?view=terrain');
-  await independent.waitForFunction(()=>window.landscape?.ready);
-  assert.equal(await independent.evaluate(()=>window.landscape.export('terrain')),exports.terrain);
-  await independent.getByRole('button',{name:'Proxy 占位',exact:true}).click();
-  await independent.locator('.proxy-overlay').evaluate(img=>img.decode());
-  assert.equal(await independent.evaluate(()=>window.landscape.export('proxy')),exports.proxy);
-  assert.equal(blockedRequests,0);
-  assert.equal(await independent.locator('.asset-overlay').count(),0);
-  await independent.close();
-  checks.push({name:'terrain and Proxy render/export with formal SVG endpoint blocked, without requesting it',passed:true});
-  await page.getByRole('button',{name:'Proxy 占位',exact:true}).click();
-  const downloading=page.waitForEvent('download');
-  await page.getByRole('button',{name:'导出截图'}).click();
-  const download=await downloading;
-  await download.saveAs('evidence/v03/button-export.png');
-  assert.equal(hash(await fs.readFile('evidence/v03/button-export.png')),hash(Buffer.from(exports.proxy.split(',')[1],'base64')));
-  checks.push({name:'actual screenshot button download',passed:true});
-  await page.getByLabel('投影校准',{exact:true}).check();
-  const calibration=await page.evaluate(()=>new XMLSerializer().serializeToString(document.querySelector('svg.calibration')));
-  assert.ok(calibration.includes('16.445'));
-  await page.locator('.viewport').screenshot({path:'evidence/v03/projection-calibration.png'});
-  await page.getByLabel('投影校准',{exact:true}).uncheck();
-  await page.getByLabel('线框',{exact:true}).check();
-  assert.equal((await page.evaluate(()=>window.landscape.stats())).wireframe,true);
-  await page.getByLabel('线框',{exact:true}).uncheck();
-  assert.equal((await page.evaluate(()=>window.landscape.stats())).wireframe,false);
-  checks.push({name:'calibration and wireframe controls',passed:true});
-  await page.screenshot({path:'evidence/v03/04-desktop-review.png',fullPage:true});
-  await page.getByLabel('参考对照',{exact:true}).check();
-  await page.locator('#reference').selectOption('winter-counterpart.png');
-  assert.equal(await page.evaluate(()=>window.landscape.export('terrain')),exports.terrain);
-  assert.equal(await page.evaluate(()=>window.landscape.view()),'proxy');
-  await page.getByRole('button',{name:'纯地形',exact:true}).click();
-  await page.locator('#reference').selectOption('v02-terrain.png');
-  await page.locator('.reference-image img').evaluate(img=>img.decode());
-  const compareBounds=await page.evaluate(()=>{
-    const current=document.querySelector('.viewport').getBoundingClientRect(),reference=document.querySelector('.reference-image').getBoundingClientRect();
-    return {current:{y:current.y,width:current.width,height:current.height},reference:{y:reference.y,width:reference.width,height:reference.height}};
+ const page=await browser.newPage({viewport:{width:1600,height:1100},deviceScaleFactor:1});
+ page.on('pageerror',e=>errors.push(e.message));page.on('console',m=>{if(m.type()==='error')errors.push(m.text());});
+ let formalRequests=0;await page.route('**/reference/live-assets.svg',route=>{formalRequests++;return route.abort();});
+ await page.goto(base,{waitUntil:'networkidle'});await page.waitForFunction(()=>window.landscape?.ready);
+ assert.equal(await page.getByLabel('秋季定稿对照',{exact:true}).isChecked(),true);
+ assert.equal(await page.getByLabel('静态云海',{exact:true}).isChecked(),false);
+ assert.equal(await page.evaluate(()=>window.landscape.view()),'terrain');
+ await page.locator('.reference-image img').evaluate(img=>img.decode());
+ const referenceSource=await fs.readFile('../references/01_autumn_approved.png.png');
+ const referenceCopy=await fs.readFile('public/reference/autumn-approved.png');
+ assert.equal(hash(referenceSource),hash(referenceCopy));
+ const bounds=await page.evaluate(()=>{
+  const rect=s=>{const b=document.querySelector(s).getBoundingClientRect();return {y:b.y,width:b.width,height:b.height};};
+  return {current:rect('.viewport'),reference:rect('.reference-image')};
+ });
+ assert.deepEqual(bounds.current,bounds.reference);assert.ok(Math.abs(bounds.current.width/bounds.current.height-16/9)<.001);
+ checks.push({name:'approved autumn is the default, original bytes preserved, aligned equal 16:9 frames',passed:true,bounds,referenceSha256:hash(referenceSource)});
+ const exports={};
+ for(const [key,view,clouds,file] of [['terrain','terrain',false,'01-terrain-16x9.png'],['clouds','terrain',true,'02-static-clouds-16x9.png'],['proxy','proxy',true,'03-proxy-clouds-16x9.png']]){
+  const data=await page.evaluate(([view,clouds])=>window.landscape.export(view,clouds),[view,clouds]);
+  assert.equal(data,await page.evaluate(([view,clouds])=>window.landscape.export(view,clouds),[view,clouds]));
+  const buffer=png(data);assert.deepEqual(size(buffer),{width:1600,height:900});exports[key]=data;await fs.writeFile(`${folder}/${file}`,buffer);
+  assert.equal((await page.evaluate(()=>window.landscape.stats())).clouds,false);
+  checks.push({name:file,passed:true,deterministic:true,size:size(buffer),sha256:hash(buffer)});
+ }
+ assert.notEqual(exports.terrain,exports.clouds);assert.notEqual(exports.clouds,exports.proxy);
+ await page.getByLabel('静态云海',{exact:true}).check();
+ assert.equal(await page.evaluate(()=>window.landscape.export()),exports.clouds);
+ await page.getByLabel('静态云海',{exact:true}).uncheck();
+ assert.equal(await page.evaluate(()=>window.landscape.export()),exports.terrain);
+ checks.push({name:'cloud toggle alters image, exports restore state, clear frame exactly recovers',passed:true});
+ const sheet=await page.evaluate(async frames=>{
+  const load=src=>new Promise((resolve,reject)=>{const im=new Image();im.onload=()=>resolve(im);im.onerror=reject;im.src=src;});
+  const ref=await load('/reference/autumn-approved.png'),terrain=await load(frames.terrain),clouds=await load(frames.clouds);
+  const c=document.createElement('canvas');c.width=3248;c.height=1944;const ctx=c.getContext('2d');
+  ctx.fillStyle='#eef0ec';ctx.fillRect(0,0,c.width,c.height);ctx.font='24px Microsoft YaHei, sans-serif';ctx.fillStyle='#354135';
+  const panel=(im,x,y,label)=>{ctx.fillText(label,x,y+32);const scale=Math.min(1600/im.width,900/im.height);const w=im.width*scale,h=im.height*scale;ctx.drawImage(im,x+(1600-w)/2,y+48+(900-h)/2,w,h);};
+  panel(ref,16,0,'秋季定稿 · 唯一主要美术基准');panel(terrain,1632,0,'V0.4 · 纯地形 / 无云海');
+  panel(ref,16,972,'秋季定稿 · 相同 1600 × 900 画框');panel(clouds,1632,972,'V0.4 · 静态云海占位 / 美术待审阅');return c.toDataURL('image/png');
+ },exports);
+ await fs.writeFile(`${folder}/04-autumn-same-scale-comparison.png`,png(sheet));
+ await page.getByLabel('静态云海',{exact:true}).check();await page.getByLabel('构图轮廓',{exact:true}).check();
+ await page.screenshot({path:`${folder}/05-aligned-contours.png`,fullPage:true});
+ for(const mode of ['overlay','wipe']){
+  await page.getByLabel('比较方式',{exact:true}).selectOption(mode);
+  await page.locator('.reference-overlay').evaluate(img=>img.decode());
+  await page.getByLabel('对照比例',{exact:true}).fill(mode==='overlay'?'40':'50');
+  assert.equal(await page.evaluate(()=>window.landscape.export()),exports.clouds);
+  await page.locator('.viewport').screenshot({path:`${folder}/06-${mode}.png`});
+ }
+ checks.push({name:'side-by-side, opacity, wipe and reference contours do not mutate terrain exports',passed:true});
+ await page.getByLabel('构图轮廓',{exact:true}).uncheck();await page.getByLabel('比较方式',{exact:true}).selectOption('side');
+ await page.getByRole('button',{name:'Proxy 占位',exact:true}).click();await page.locator('.proxy-overlay').evaluate(img=>img.decode());
+ const downloading=page.waitForEvent('download');await page.getByRole('button',{name:'导出截图'}).click();const download=await downloading;await download.saveAs(`${folder}/button-export.png`);
+ assert.equal(hash(await fs.readFile(`${folder}/button-export.png`)),hash(png(exports.proxy)));
+ await page.getByLabel('投影校准',{exact:true}).check();assert.ok((await page.locator('.calibration').textContent()).includes('16.445'));await page.getByLabel('投影校准',{exact:true}).uncheck();
+ await page.getByLabel('线框',{exact:true}).check();assert.equal((await page.evaluate(()=>window.landscape.stats())).wireframe,true);await page.getByLabel('线框',{exact:true}).uncheck();
+ await page.screenshot({path:`${folder}/07-desktop-review.png`,fullPage:true});
+ checks.push({name:'actual export button, calibration and wireframe',passed:true});
+ const responsive=[];
+ for(const width of [1600,1024,768,390]){
+  await page.setViewportSize({width,height:1000});
+  const metrics=await page.evaluate(()=>{
+   const rect=s=>{const b=document.querySelector(s).getBoundingClientRect();return {x:b.x,y:b.y,width:b.width,height:b.height};};
+   return {viewport:rect('.viewport'),canvas:rect('canvas'),proxy:rect('.proxy-overlay'),reference:rect('.reference-image'),scrollWidth:document.documentElement.scrollWidth};
   });
-  assert.deepEqual(compareBounds.current,compareBounds.reference);
-  await page.screenshot({path:'evidence/v03/05-before-after.png',fullPage:true});
-  await page.getByLabel('参考对照',{exact:true}).uncheck();
-  checks.push({name:'reference selection does not change study mode, terrain or season',passed:true});
-  const responsive=[];
-  for(const [mode,label] of [['proxy','Proxy 占位'],['composite','SVG 对照']])for(const width of [1440,1024,768,390]){
-    await page.getByRole('button',{name:label,exact:true}).click();
-    await page.setViewportSize({width,height:900});
-    const metrics=await page.evaluate(mode=>{
-      const rect=el=>{const b=el.getBoundingClientRect();return {x:b.x,y:b.y,width:b.width,height:b.height};};
-      return {viewport:rect(document.querySelector('.viewport')),canvas:rect(document.querySelector('canvas')),overlay:rect(document.querySelector(mode==='proxy'?'.proxy-overlay':'.asset-overlay')),scrollWidth:document.documentElement.scrollWidth,width:innerWidth};
-    },mode);
-    assert.ok(Math.abs(metrics.viewport.width/metrics.viewport.height-1.5)<.001);
-    assert.deepEqual(metrics.canvas,metrics.overlay);
-    assert.ok(metrics.scrollWidth<=width);
-    responsive.push({mode,...metrics});
-  }
-  await page.getByRole('button',{name:'Proxy 占位',exact:true}).click();
-  await page.screenshot({path:'evidence/v03/06-mobile-review.png',fullPage:true});
-  checks.push({name:'responsive layout and synchronized overlays/Canvas bounds',passed:true,sizes:responsive});
-
-  // Re-open the actual preserved SVG, then compare its CTMs and bounds to live DOM provenance.
-  const provenance=JSON.parse(await fs.readFile('public/reference/provenance.json','utf8'));
-  const assetPage=await browser.newPage({viewport:{width:1200,height:800},deviceScaleFactor:1});
-  await assetPage.goto(base+'/reference/live-assets.svg');
-  const measured=await assetPage.evaluate(ids=>ids.map(id=>{
-    const el=document.getElementById(id),m=el.getCTM(),b=el.getBoundingClientRect();
-    return {id,ctm:{a:m.a,b:m.b,c:m.c,d:m.d,e:m.e,f:m.f},bounds:{x:b.x,y:b.y,width:b.width,height:b.height}};
-  }),provenance.anchors.map(a=>a.id));
-  let maxMatrixError=0,maxBoundsError=0;
-  const alignment=measured.map(m=>{
-    const original=provenance.anchors.find(a=>a.id===m.id);
-    const matrixError=Math.max(...Object.keys(m.ctm).map(k=>Math.abs(m.ctm[k]-original.ctm[k])));
-    const boundsError=Math.max(...Object.keys(m.bounds).map(k=>Math.abs(m.bounds[k]-original.bounds[k])));
-    maxMatrixError=Math.max(maxMatrixError,matrixError);maxBoundsError=Math.max(maxBoundsError,boundsError);
-    return {id:m.id,matrixError,boundsError};
-  });
-  await fs.writeFile('evidence/asset-alignment.json',JSON.stringify({maxMatrixError,maxBoundsError,alignment},null,2));
-  assert.ok(maxMatrixError<.001,`Asset CTM changed by ${maxMatrixError}`);
-  assert.ok(maxBoundsError<1,`Asset bounds changed by ${maxBoundsError}px`);
-  checks.push({name:'real SVG snapshot matches live source placement',mock:false,passed:true,maxMatrixError,maxBoundsError,boundsTolerancePx:1,note:'Transforms are checked separately at 0.001 tolerance. The observatory has a recorded subpixel bounds difference after SVG isolation; this is not a pixel-identical full-scene claim.',alignment});
-  // The immutable source is verified above. The delivered composition intentionally relocates it.
-  const source=await fs.readFile('public/reference/live-assets.svg','utf8');
-  const repositorySource=execFileSync('git',['show','HEAD:public/reference/live-assets.svg'],{encoding:'utf8',maxBuffer:20*1024*1024});
-  const normalize=text=>text.replace(/\r\n/g,'\n');
-  assert.equal(hash(Buffer.from(normalize(source))),hash(Buffer.from(normalize(repositorySource))));
-  const sourcePreservation={matchesCommittedSource:true,normalizedSha256:hash(Buffer.from(normalize(source))),historicalCaptureSha256:provenance.assetsSha256,historicalCaptureHashMatches:hash(Buffer.from(source))===provenance.assetsSha256,note:'The historical provenance checksum already differs from the committed snapshot. Preservation is checked against Git HEAD with line endings normalized, plus subtree equality below.'};
-  const placements=await page.evaluate(()=>window.landscape.assets());
-  const relocatedSvg=await page.evaluate(()=>window.landscape.assetSvg());
-  await assetPage.goto('about:blank');
-  await assetPage.setContent('<style>body{margin:0}svg{display:block}</style>'+relocatedSvg);
-  const relocated=await assetPage.evaluate(({placements,source})=>{
-    const original=new DOMParser().parseFromString(source,'image/svg+xml');
-    return placements.map(p=>{
-      const element=document.getElementById(p.id),m=element.getCTM(),b=element.getBoundingClientRect();
-      const sourceGroup=original.querySelector(`[data-source-id="${p.id}"]`);
-      const movedGroup=document.querySelector(`[data-source-id="${p.id}"]`);
-      return {id:p.id,sourceGeometryUnchanged:sourceGroup.isEqualNode(movedGroup),ctm:{a:m.a,b:m.b,c:m.c,d:m.d,e:m.e,f:m.f},bounds:{x:b.x,y:b.y,width:b.width,height:b.height},visible:b.right>0&&b.left<1200&&b.bottom>0&&b.top<800};
-    });
-  },{placements,source});
-  assert.equal(relocated.length,10);
-  const relocationReport=relocated.map(m=>{
-    const p=placements.find(p=>p.id===m.id),original=provenance.anchors.find(a=>a.id===m.id);
-    const expected={a:original.ctm.a*p.scale,b:original.ctm.b*p.scale,c:original.ctm.c*p.scale,d:original.ctm.d*p.scale,e:original.ctm.e*p.scale+p.dx,f:original.ctm.f*p.scale+p.dy};
-    const matrixError=Math.max(...Object.keys(expected).map(k=>Math.abs(expected[k]-m.ctm[k])));
-    assert.ok(matrixError<.001,`${m.id} relocation matrix error ${matrixError}`);
-    assert.ok(m.visible,`${m.id} disappeared from frame`);
-    assert.ok(m.sourceGeometryUnchanged,`${m.id} original geometry was modified`);
-    return {...p,...m,matrixError,expected};
-  });
-  const house=relocationReport.find(p=>p.id==='living-cottage-haven');
-  assert.equal(house.scale,1);
-  assert.ok(Math.abs(house.bounds.width-422.4)<1);
-  await fs.writeFile('evidence/asset-placement.json',JSON.stringify({version:'0.3',sourcePreservation,passed:true,assets:relocationReport},null,2));
-  checks.push({name:'all ten original SVG groups preserved, placed on terrain and visible; house retains original size',passed:true,maxMatrixError:Math.max(...relocationReport.map(p=>p.matrixError))});
-  const stats=await page.evaluate(()=>window.landscape.stats());
-  assert.equal(errors.length,0,errors.join('\n'));
-  const report={version:'0.3',passed:true,url:base,browser:browser.version(),renderer:'Chromium WebGL / SwiftShader software renderer, not a hardware performance benchmark',consoleErrors:errors,stats,checks,artApproval:'PENDING REVIEW. Engineering checks do not assert artistic acceptance.'};
-  await fs.writeFile('evidence/browser-report.json',JSON.stringify(report,null,2));
-  await fs.writeFile('evidence/v03/browser-report.json',JSON.stringify(report,null,2));
-  console.log(JSON.stringify({passed:true,consoleErrors:errors,stats,maxMatrixError,maxBoundsError,checks:checks.length},null,2));
-} catch(error) {
-  await fs.writeFile('evidence/browser-report.json',JSON.stringify({passed:false,consoleErrors:errors,checks,error:String(error)},null,2));
-  throw error;
-} finally {await browser.close();}
+  assert.ok(Math.abs(metrics.viewport.width/metrics.viewport.height-16/9)<.001);assert.deepEqual(metrics.canvas,metrics.proxy);
+  assert.equal(metrics.viewport.width,metrics.reference.width);assert.equal(metrics.viewport.height,metrics.reference.height);assert.ok(metrics.scrollWidth<=width);
+  responsive.push({width,...metrics});
+ }
+ await page.screenshot({path:`${folder}/08-mobile-review.png`,fullPage:true});checks.push({name:'responsive synchronized frame sizes',passed:true,responsive});
+ await page.goto(base+'/?frame=integration&view=proxy',{waitUntil:'networkidle'});await page.waitForFunction(()=>window.landscape?.ready);await page.locator('.proxy-overlay').evaluate(img=>img.decode());
+ const integration=await page.evaluate(()=>window.landscape.export());assert.deepEqual(size(png(integration)),{width:1200,height:800});
+ const contract=await page.locator('.proxy-overlay').evaluate(img=>{
+  const xml=new DOMParser().parseFromString(decodeURIComponent(img.src.split(',')[1]),'image/svg+xml');
+  const b=img.getBoundingClientRect(),c=document.querySelector('canvas').getBoundingClientRect();
+  return {viewBox:xml.documentElement.getAttribute('viewBox'),transform:xml.querySelector('g').getAttribute('transform'),aligned:b.width===c.width&&b.height===c.height};
+ });
+ assert.equal(contract.viewBox,'0 0 1200 800');assert.equal(contract.transform,'translate(0 62.5) scale(0.75)');assert.ok(contract.aligned);
+ await fs.writeFile(`${folder}/09-integration-1200x800.png`,png(integration));
+ checks.push({name:'1200x800 SVG-layer contract with Proxy only, no formal artwork integration',passed:true,contract});
+ assert.equal(formalRequests,0);assert.deepEqual(errors,[]);
+ checks.push({name:'no formal SVG requests across all tested modes; no browser errors',passed:true,formalRequests});
+ const report={version:'0.4',passed:true,artApproval:'PENDING_AUTHOR_REVIEW',artLimitations:['Ridge silhouettes remain angular and some shoulders still merge; not yet the approved forms.','Cloud surface reads as broad bands, not the approved soft cloud masses.','Foreground field edges remain too regular.','Uncovered mountain bases still merge into a substantial background mass.'],url:base,browser:browser.version(),renderer:'Chromium SwiftShader; not a GPU benchmark',checks,errors};
+ await fs.writeFile(`${folder}/browser-report.json`,JSON.stringify(report,null,2));await fs.writeFile('evidence/browser-report.json',JSON.stringify(report,null,2));
+ console.log(JSON.stringify({passed:true,checks:checks.length,formalRequests,errors},null,2));
+} catch(error){await fs.writeFile(`${folder}/browser-report.json`,JSON.stringify({passed:false,checks,errors,error:String(error)},null,2));throw error;}finally{await browser.close();}

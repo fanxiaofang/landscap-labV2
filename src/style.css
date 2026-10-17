@@ -4,3 +4,14 @@
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
 .proxy-overlay{position:absolute;inset:0;width:100%;height:100%;display:block;pointer-events:none}.debug-controls{flex-wrap:wrap}.debug-controls label{white-space:nowrap}.overlay-status{position:absolute;left:14px;bottom:14px;background:oklch(94% .015 125);color:var(--accent);padding:6px 10px;border-radius:4px;font-size:12px}.capture .overlay-status{display:none}
 .comparison-heading{display:flex;align-items:center;min-height:32px;margin-bottom:10px;font-size:12px}.reference-heading{min-height:32px}
+/* V0.4: the artwork comparison is always 16:9. 3:2 is an explicit compatibility mode. */
+.viewport{aspect-ratio:var(--frame-ratio);background:linear-gradient(#c38992 0%,#ee9b7b 16%,#ffc66d 29%)}
+.reference-image{position:relative;aspect-ratio:16 / 9;overflow:hidden}
+.reference-image img{position:absolute;inset:0;object-fit:contain}
+.reference-overlay,.contour-guides{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;pointer-events:none}
+.reference-overlay{display:block}.wipe-divider{position:absolute;top:0;bottom:0;width:2px;background:white;pointer-events:none}
+.comparison-controls{display:flex;align-items:center;flex-wrap:wrap;gap:18px;padding:10px 0 14px;font-size:12px;color:var(--muted);border-top:1px solid var(--line)}
+.comparison-controls select{background:transparent;border:1px solid var(--line);border-radius:4px;padding:4px;color:inherit;font-size:12px}
+.mix-control{margin-left:auto}.mix-control input{width:100px;accent-color:var(--accent)}.mix-control output{min-width:4ch}
+.capture{width:var(--frame-width)}.capture .viewport{width:var(--frame-width);height:var(--frame-height)}.capture .preview-layout{display:block}
+@media(max-width:760px){.comparison-controls{gap:12px}.mix-control{width:100%;margin:0}.workspace-heading h1{max-width:18ch}.reference-panel p{margin-bottom:0}}

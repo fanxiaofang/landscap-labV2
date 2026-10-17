@@ -1,8 +1,9 @@
-import { projectPoint, measureProjection, PROJECTION } from '../world/projection';
+import { projectPoint, measureProjection, PROJECTION, FRAME, frameMapping, type Frame } from '../world/projection';
 import { groundHeight, WALK_ROUTE, RIDGES } from '../terrain/layout';
 import { sceneLayout } from './placements';
 
-export function Calibration() {
+export function Calibration({frame=FRAME}:{frame?:Frame}) {
+  const {scale,offsetY}=frameMapping(frame);
   const projection=measureProjection();
   const home=sceneLayout().find(a=>a.slot==='home')!;
   const center={u:home.u,d:home.d,h:home.h};
@@ -11,8 +12,8 @@ export function Calibration() {
     return `${a.x},${a.y} ${b.x},${b.y}`;
   };
   const samples=[...sceneLayout().filter(a=>['home','tractor','bridge'].includes(a.slot)),...RIDGES.slice(0,4).map(r=>{const p=r.points.reduce((a,b)=>a.h>b.h?a:b);return {...p,name:r.name};})];
-  return <svg className="calibration" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" aria-label="投影轴与高程校准">
-    <g fill="none" stroke="#f9f7e8" strokeWidth="1.2" opacity=".7">
+  return <svg className="calibration" xmlns="http://www.w3.org/2000/svg" viewBox={`0 0 ${frame.width} ${frame.height}`} aria-label="投影轴与高程校准">
+    <g transform={`translate(0 ${offsetY}) scale(${scale})`}><g fill="none" stroke="#f9f7e8" strokeWidth="1.2" opacity=".7">
       {[-180,-120,-60,0,60,120,180].map(n=><g key={n}>
         <polyline points={line(200,200)} transform={`translate(${n} ${n*PROJECTION.groundSlope})`}/>
         <polyline points={line(200,-200)} transform={`translate(${n} ${-n*PROJECTION.groundSlope})`}/>
@@ -25,5 +26,5 @@ export function Calibration() {
     <rect x="20" y="20" width="382" height="66" fill="#fbf8ed" opacity=".94" rx="5"/>
     <text x="34" y="45" fontSize="14" fill="#28382b" fontFamily="sans-serif">地面轴 ±{Math.abs(projection.anglesDegrees[0]).toFixed(3)}° · 相机仰角 {projection.elevationDegrees.toFixed(3)}°</text>
     <text x="34" y="68" fontSize="12" fill="#4c594d" fontFamily="sans-serif">白线：下行路径 / 地面网格只在主屋平台校准</text>
-  </svg>;
+    </g></svg>;
 }

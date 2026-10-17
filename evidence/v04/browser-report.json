@@ -1,0 +1,208 @@
+{
+  "version": "0.4",
+  "passed": true,
+  "artApproval": "PENDING_AUTHOR_REVIEW",
+  "artLimitations": [
+    "Ridge silhouettes remain angular and some shoulders still merge; not yet the approved forms.",
+    "Cloud surface reads as broad bands, not the approved soft cloud masses.",
+    "Foreground field edges remain too regular.",
+    "Uncovered mountain bases still merge into a substantial background mass."
+  ],
+  "url": "http://127.0.0.1:4180",
+  "browser": "141.0.7390.37",
+  "renderer": "Chromium SwiftShader; not a GPU benchmark",
+  "checks": [
+    {
+      "name": "approved autumn is the default, original bytes preserved, aligned equal 16:9 frames",
+      "passed": true,
+      "bounds": {
+        "current": {
+          "y": 331.5,
+          "width": 614,
+          "height": 345.375
+        },
+        "reference": {
+          "y": 331.5,
+          "width": 614,
+          "height": 345.375
+        }
+      },
+      "referenceSha256": "a41d76602c240d15acde1931db9a4846834d62e471a3d794896cec531d2aa51a"
+    },
+    {
+      "name": "01-terrain-16x9.png",
+      "passed": true,
+      "deterministic": true,
+      "size": {
+        "width": 1600,
+        "height": 900
+      },
+      "sha256": "04ee2cac72951473fb0c1fe82320536be13f052945f6806801a58a74243f2a81"
+    },
+    {
+      "name": "02-static-clouds-16x9.png",
+      "passed": true,
+      "deterministic": true,
+      "size": {
+        "width": 1600,
+        "height": 900
+      },
+      "sha256": "d835d7fbc70d3cb467669bee7a2ae91476fe02de6c2d48003d3382db52530bd7"
+    },
+    {
+      "name": "03-proxy-clouds-16x9.png",
+      "passed": true,
+      "deterministic": true,
+      "size": {
+        "width": 1600,
+        "height": 900
+      },
+      "sha256": "5f85991bc7be25448aab60df71897623cdd5598af4afd48cedd5e0bf86483416"
+    },
+    {
+      "name": "cloud toggle alters image, exports restore state, clear frame exactly recovers",
+      "passed": true
+    },
+    {
+      "name": "side-by-side, opacity, wipe and reference contours do not mutate terrain exports",
+      "passed": true
+    },
+    {
+      "name": "actual export button, calibration and wireframe",
+      "passed": true
+    },
+    {
+      "name": "responsive synchronized frame sizes",
+      "passed": true,
+      "responsive": [
+        {
+          "width": 1600,
+          "viewport": {
+            "x": 176,
+            "y": 331.5,
+            "width": 614,
+            "height": 345.375
+          },
+          "canvas": {
+            "x": 176,
+            "y": 331.5,
+            "width": 614,
+            "height": 345.375
+          },
+          "proxy": {
+            "x": 176,
+            "y": 331.5,
+            "width": 614,
+            "height": 345.375
+          },
+          "reference": {
+            "x": 810,
+            "y": 331.5,
+            "width": 614,
+            "height": 345.375
+          },
+          "scrollWidth": 1600
+        },
+        {
+          "width": 1024,
+          "viewport": {
+            "x": 36,
+            "y": 331.5,
+            "width": 466,
+            "height": 262.125
+          },
+          "canvas": {
+            "x": 36,
+            "y": 331.5,
+            "width": 466,
+            "height": 262.125
+          },
+          "proxy": {
+            "x": 36,
+            "y": 331.5,
+            "width": 466,
+            "height": 262.125
+          },
+          "reference": {
+            "x": 522,
+            "y": 331.5,
+            "width": 466,
+            "height": 262.125
+          },
+          "scrollWidth": 1024
+        },
+        {
+          "width": 768,
+          "viewport": {
+            "x": 36,
+            "y": 331.5,
+            "width": 338,
+            "height": 190.125
+          },
+          "canvas": {
+            "x": 36,
+            "y": 331.5,
+            "width": 338,
+            "height": 190.125
+          },
+          "proxy": {
+            "x": 36,
+            "y": 331.5,
+            "width": 338,
+            "height": 190.125
+          },
+          "reference": {
+            "x": 394,
+            "y": 331.5,
+            "width": 338,
+            "height": 190.125
+          },
+          "scrollWidth": 768
+        },
+        {
+          "width": 390,
+          "viewport": {
+            "x": 16,
+            "y": 328,
+            "width": 358,
+            "height": 201.375
+          },
+          "canvas": {
+            "x": 16,
+            "y": 328,
+            "width": 358,
+            "height": 201.375
+          },
+          "proxy": {
+            "x": 16,
+            "y": 328,
+            "width": 358,
+            "height": 201.375
+          },
+          "reference": {
+            "x": 16,
+            "y": 624.375,
+            "width": 358,
+            "height": 201.375
+          },
+          "scrollWidth": 390
+        }
+      ]
+    },
+    {
+      "name": "1200x800 SVG-layer contract with Proxy only, no formal artwork integration",
+      "passed": true,
+      "contract": {
+        "viewBox": "0 0 1200 800",
+        "transform": "translate(0 62.5) scale(0.75)",
+        "aligned": true
+      }
+    },
+    {
+      "name": "no formal SVG requests across all tested modes; no browser errors",
+      "passed": true,
+      "formalRequests": 0
+    }
+  ],
+  "errors": []
+}

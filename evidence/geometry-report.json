@@ -1,9 +1,722 @@
 {
-  "version": "0.3",
+  "version": "0.4",
   "units": "study units, not metres",
-  "cloudSeaRendered": false,
+  "cloudSeaMode": "optional static mesh; both clear and cloud previews required",
   "passed": true,
+  "artApproval": "PENDING_AUTHOR_REVIEW",
+  "visualObservations": {
+    "reference": "autumn-approved.png",
+    "referenceBasis": "manual normalized contour tracing; approximate, not semantic segmentation",
+    "referenceBands": {
+      "sky": 0.23185449999999996,
+      "foreground": 0.4684149999999999,
+      "valleyAndMountains": 0.2997305000000001
+    },
+    "currentForeground": 0.45543280782996276,
+    "foregroundDeltaPercentagePoints": -1.2982192170037155,
+    "foregroundBoundary": [
+      {
+        "x": 0,
+        "y": 0.3685392655300781
+      },
+      {
+        "x": 0.00625,
+        "y": 0.36979886819353897
+      },
+      {
+        "x": 0.0125,
+        "y": 0.3711016641495088
+      },
+      {
+        "x": 0.01875,
+        "y": 0.3724484047020722
+      },
+      {
+        "x": 0.025,
+        "y": 0.37383964290643235
+      },
+      {
+        "x": 0.03125,
+        "y": 0.3752760237106189
+      },
+      {
+        "x": 0.0375,
+        "y": 0.37675829021854557
+      },
+      {
+        "x": 0.04375,
+        "y": 0.37828516034545506
+      },
+      {
+        "x": 0.05,
+        "y": 0.37985745384416325
+      },
+      {
+        "x": 0.05625,
+        "y": 0.38147744741736844
+      },
+      {
+        "x": 0.0625,
+        "y": 0.3831427651091945
+      },
+      {
+        "x": 0.06875,
+        "y": 0.38485425329130546
+      },
+      {
+        "x": 0.075,
+        "y": 0.3866114759969564
+      },
+      {
+        "x": 0.08125,
+        "y": 0.3884158331955344
+      },
+      {
+        "x": 0.0875,
+        "y": 0.39026264077221173
+      },
+      {
+        "x": 0.09375,
+        "y": 0.39215527641384257
+      },
+      {
+        "x": 0.1,
+        "y": 0.3940924948194753
+      },
+      {
+        "x": 0.10625,
+        "y": 0.39607316960271427
+      },
+      {
+        "x": 0.1125,
+        "y": 0.3980962860474945
+      },
+      {
+        "x": 0.11875,
+        "y": 0.4001609334567985
+      },
+      {
+        "x": 0.125,
+        "y": 0.40226629722282753
+      },
+      {
+        "x": 0.13125,
+        "y": 0.4044116507295073
+      },
+      {
+        "x": 0.1375,
+        "y": 0.40659634718129745
+      },
+      {
+        "x": 0.14375,
+        "y": 0.40881981143628426
+      },
+      {
+        "x": 0.15,
+        "y": 0.4110767057092317
+      },
+      {
+        "x": 0.15625,
+        "y": 0.41337039208889165
+      },
+      {
+        "x": 0.1625,
+        "y": 0.4156985485675619
+      },
+      {
+        "x": 0.16875,
+        "y": 0.41805758757754174
+      },
+      {
+        "x": 0.175,
+        "y": 0.42044934571604453
+      },
+      {
+        "x": 0.18125,
+        "y": 0.42286932304069025
+      },
+      {
+        "x": 0.1875,
+        "y": 0.42531756932286013
+      },
+      {
+        "x": 0.19375,
+        "y": 0.42779412423211355
+      },
+      {
+        "x": 0.2,
+        "y": 0.4302924268392985
+      },
+      {
+        "x": 0.20625,
+        "y": 0.4328149269462082
+      },
+      {
+        "x": 0.2125,
+        "y": 0.43535975892481965
+      },
+      {
+        "x": 0.21875,
+        "y": 0.43792483822621453
+      },
+      {
+        "x": 0.225,
+        "y": 0.44050669896434436
+      },
+      {
+        "x": 0.23125,
+        "y": 0.4431042838883325
+      },
+      {
+        "x": 0.2375,
+        "y": 0.4457165784948217
+      },
+      {
+        "x": 0.24375,
+        "y": 0.44834163285951223
+      },
+      {
+        "x": 0.25,
+        "y": 0.45097752709214195
+      },
+      {
+        "x": 0.25625,
+        "y": 0.45362236911862275
+      },
+      {
+        "x": 0.2625,
+        "y": 0.4562742931770542
+      },
+      {
+        "x": 0.26875,
+        "y": 0.45893145900215704
+      },
+      {
+        "x": 0.275,
+        "y": 0.46159205167195294
+      },
+      {
+        "x": 0.28125,
+        "y": 0.4642542820903051
+      },
+      {
+        "x": 0.2875,
+        "y": 0.4669163880791365
+      },
+      {
+        "x": 0.29375,
+        "y": 0.4695766360545957
+      },
+      {
+        "x": 0.3,
+        "y": 0.4722320572139236
+      },
+      {
+        "x": 0.30625,
+        "y": 0.4748813430668439
+      },
+      {
+        "x": 0.3125,
+        "y": 0.477523579502543
+      },
+      {
+        "x": 0.31875,
+        "y": 0.4801572017294889
+      },
+      {
+        "x": 0.325,
+        "y": 0.4827806906857909
+      },
+      {
+        "x": 0.33125,
+        "y": 0.48539257769041405
+      },
+      {
+        "x": 0.3375,
+        "y": 0.4879914494818175
+      },
+      {
+        "x": 0.34375,
+        "y": 0.4905740392319822
+      },
+      {
+        "x": 0.35,
+        "y": 0.49314009597827635
+      },
+      {
+        "x": 0.35625,
+        "y": 0.4956893024985224
+      },
+      {
+        "x": 0.3625,
+        "y": 0.49822055588726294
+      },
+      {
+        "x": 0.36875,
+        "y": 0.5007328387838688
+      },
+      {
+        "x": 0.375,
+        "y": 0.50322522576628
+      },
+      {
+        "x": 0.38125,
+        "y": 0.5056968897868444
+      },
+      {
+        "x": 0.3875,
+        "y": 0.508145141077713
+      },
+      {
+        "x": 0.39375,
+        "y": 0.5105713798862085
+      },
+      {
+        "x": 0.4,
+        "y": 0.512975305432014
+      },
+      {
+        "x": 0.40625,
+        "y": 0.5153565766534205
+      },
+      {
+        "x": 0.4125,
+        "y": 0.5177149797257872
+      },
+      {
+        "x": 0.41875,
+        "y": 0.5200504326750173
+      },
+      {
+        "x": 0.425,
+        "y": 0.5223629893577761
+      },
+      {
+        "x": 0.43125,
+        "y": 0.5246528426954112
+      },
+      {
+        "x": 0.4375,
+        "y": 0.5269203270491419
+      },
+      {
+        "x": 0.44375,
+        "y": 0.5291659196274895
+      },
+      {
+        "x": 0.45,
+        "y": 0.5313902408233983
+      },
+      {
+        "x": 0.45625,
+        "y": 0.5335940533883167
+      },
+      {
+        "x": 0.4625,
+        "y": 0.5357782603637535
+      },
+      {
+        "x": 0.46875,
+        "y": 0.5379439017075359
+      },
+      {
+        "x": 0.475,
+        "y": 0.5400901416368842
+      },
+      {
+        "x": 0.48125,
+        "y": 0.542218816469621
+      },
+      {
+        "x": 0.4875,
+        "y": 0.5443323444751622
+      },
+      {
+        "x": 0.49375,
+        "y": 0.5464322585057321
+      },
+      {
+        "x": 0.5,
+        "y": 0.54852019482989
+      },
+      {
+        "x": 0.50625,
+        "y": 0.5505926701298396
+      },
+      {
+        "x": 0.5125,
+        "y": 0.5526561744013637
+      },
+      {
+        "x": 0.51875,
+        "y": 0.5547127029926777
+      },
+      {
+        "x": 0.525,
+        "y": 0.556759453119517
+      },
+      {
+        "x": 0.53125,
+        "y": 0.5588009919760385
+      },
+      {
+        "x": 0.5375,
+        "y": 0.5608411763135353
+      },
+      {
+        "x": 0.54375,
+        "y": 0.5628744859053418
+      },
+      {
+        "x": 0.55,
+        "y": 0.5649102413459021
+      },
+      {
+        "x": 0.55625,
+        "y": 0.5669459685285696
+      },
+      {
+        "x": 0.5625,
+        "y": 0.5689844802990145
+      },
+      {
+        "x": 0.56875,
+        "y": 0.5710289592484349
+      },
+      {
+        "x": 0.575,
+        "y": 0.5730775216923177
+      },
+      {
+        "x": 0.58125,
+        "y": 0.5751373660824582
+      },
+      {
+        "x": 0.5875,
+        "y": 0.5772031896857416
+      },
+      {
+        "x": 0.59375,
+        "y": 0.5792847880169499
+      },
+      {
+        "x": 0.6,
+        "y": 0.5813751338802106
+      },
+      {
+        "x": 0.60625,
+        "y": 0.5834842306303685
+      },
+      {
+        "x": 0.6125,
+        "y": 0.5856064499203935
+      },
+      {
+        "x": 0.61875,
+        "y": 0.5877491406809747
+      },
+      {
+        "x": 0.625,
+        "y": 0.5899092911259675
+      },
+      {
+        "x": 0.63125,
+        "y": 0.5920909314680141
+      },
+      {
+        "x": 0.6375,
+        "y": 0.5942944639672745
+      },
+      {
+        "x": 0.64375,
+        "y": 0.5965194805291615
+      },
+      {
+        "x": 0.65,
+        "y": 0.5987709942228346
+      },
+      {
+        "x": 0.65625,
+        "y": 0.6010426828061303
+      },
+      {
+        "x": 0.6625,
+        "y": 0.6033424063744678
+      },
+      {
+        "x": 0.66875,
+        "y": 0.6056659519705027
+      },
+      {
+        "x": 0.675,
+        "y": 0.6080144915007318
+      },
+      {
+        "x": 0.68125,
+        "y": 0.610390956313218
+      },
+      {
+        "x": 0.6875,
+        "y": 0.6127884960506098
+      },
+      {
+        "x": 0.69375,
+        "y": 0.6152121385922237
+      },
+      {
+        "x": 0.7,
+        "y": 0.6176611836655113
+      },
+      {
+        "x": 0.70625,
+        "y": 0.6201285036552602
+      },
+      {
+        "x": 0.7125,
+        "y": 0.6226190299759342
+      },
+      {
+        "x": 0.71875,
+        "y": 0.6251300072073241
+      },
+      {
+        "x": 0.725,
+        "y": 0.6276546909119276
+      },
+      {
+        "x": 0.73125,
+        "y": 0.6301966523660341
+      },
+      {
+        "x": 0.7375,
+        "y": 0.6327509279863027
+      },
+      {
+        "x": 0.74375,
+        "y": 0.6353124146846264
+      },
+      {
+        "x": 0.75,
+        "y": 0.6378830604517821
+      },
+      {
+        "x": 0.75625,
+        "y": 0.6404531657284392
+      },
+      {
+        "x": 0.7625,
+        "y": 0.64302417337288
+      },
+      {
+        "x": 0.76875,
+        "y": 0.6455892608439784
+      },
+      {
+        "x": 0.775,
+        "y": 0.6481456870631117
+      },
+      {
+        "x": 0.78125,
+        "y": 0.6506877857105237
+      },
+      {
+        "x": 0.7875,
+        "y": 0.6532140028269271
+      },
+      {
+        "x": 0.79375,
+        "y": 0.6557143018650826
+      },
+      {
+        "x": 0.8,
+        "y": 0.6581898311571324
+      },
+      {
+        "x": 0.80625,
+        "y": 0.6606350572608565
+      },
+      {
+        "x": 0.8125,
+        "y": 0.6630405010493086
+      },
+      {
+        "x": 0.81875,
+        "y": 0.6654062877181143
+      },
+      {
+        "x": 0.825,
+        "y": 0.6677276657962575
+      },
+      {
+        "x": 0.83125,
+        "y": 0.6700003036478204
+      },
+      {
+        "x": 0.8375,
+        "y": 0.6722203742820906
+      },
+      {
+        "x": 0.84375,
+        "y": 0.6743846306390109
+      },
+      {
+        "x": 0.85,
+        "y": 0.676490468857681
+      },
+      {
+        "x": 0.85625,
+        "y": 0.6785330966721227
+      },
+      {
+        "x": 0.8625,
+        "y": 0.6805106559699501
+      },
+      {
+        "x": 0.86875,
+        "y": 0.6824248991791783
+      },
+      {
+        "x": 0.875,
+        "y": 0.6842700461196137
+      },
+      {
+        "x": 0.88125,
+        "y": 0.6860488831358579
+      },
+      {
+        "x": 0.8875,
+        "y": 0.6877580462255873
+      },
+      {
+        "x": 0.89375,
+        "y": 0.6894023244468817
+      },
+      {
+        "x": 0.9,
+        "y": 0.6909765485540267
+      },
+      {
+        "x": 0.90625,
+        "y": 0.6924856294893864
+      },
+      {
+        "x": 0.9125,
+        "y": 0.6939317212450204
+      },
+      {
+        "x": 0.91875,
+        "y": 0.6953164601874109
+      },
+      {
+        "x": 0.925,
+        "y": 0.6966420954433751
+      },
+      {
+        "x": 0.93125,
+        "y": 0.6979114161906225
+      },
+      {
+        "x": 0.9375,
+        "y": 0.6991276737199836
+      },
+      {
+        "x": 0.94375,
+        "y": 0.7002945008447106
+      },
+      {
+        "x": 0.95,
+        "y": 0.7014158310880321
+      },
+      {
+        "x": 0.95625,
+        "y": 0.7024958198534497
+      },
+      {
+        "x": 0.9625,
+        "y": 0.7035387694900015
+      },
+      {
+        "x": 0.96875,
+        "y": 0.7045490598256524
+      },
+      {
+        "x": 0.975,
+        "y": 0.7055310853756862
+      },
+      {
+        "x": 0.98125,
+        "y": 0.7064892000587338
+      },
+      {
+        "x": 0.9875,
+        "y": 0.7074276698887437
+      },
+      {
+        "x": 0.99375,
+        "y": 0.7083480429784222
+      },
+      {
+        "x": 1,
+        "y": 0.7092567356640437
+      }
+    ],
+    "referenceForeground": [
+      [
+        0,
+        0.37
+      ],
+      [
+        0.1,
+        0.39
+      ],
+      [
+        0.21,
+        0.43
+      ],
+      [
+        0.32,
+        0.475
+      ],
+      [
+        0.43,
+        0.51
+      ],
+      [
+        0.54,
+        0.535
+      ],
+      [
+        0.65,
+        0.567
+      ],
+      [
+        0.73,
+        0.612
+      ],
+      [
+        0.82,
+        0.65
+      ],
+      [
+        0.9,
+        0.675
+      ],
+      [
+        1,
+        0.715
+      ]
+    ],
+    "artApproval": "PENDING_AUTHOR_REVIEW",
+    "retiredV03ArtGates": [
+      "primary field below home in screen space",
+      "primary field fully inside frame",
+      "left parcel gap >20 px"
+    ],
+    "retirementReason": "Approved autumn image uses receding farmland, cropped at the left edge. These historical layout choices cannot gate the new composition."
+  },
+  "maxCameraError": 2.2737367544323206e-13,
   "assertions": {
+    "bothFrameProjectionsMatchCamera": true,
     "peaksBelowHome": true,
     "routeDescendsOverall": true,
     "routeRollingRiseUnder2Degrees": true,
@@ -17,542 +730,539 @@
     "validMeshes": true,
     "projectionMatchesGroundAxes": true,
     "homeRemainsStable": true,
-    "primaryFieldVisuallyBelowHome": true,
-    "primaryFieldFullyInFrame": true,
-    "leftParcelsSeparatedInProjection": true,
     "allNarrativeSlotsPresent": true
   },
   "samples": [
     {
       "name": "桥 / 火车",
-      "u": -465,
-      "d": 2250,
-      "elevation": -422.555308,
+      "u": -645,
+      "d": 810,
+      "elevation": 196.734542,
       "screen": {
-        "x": 135,
-        "y": 490.1404504410656
+        "x": 155,
+        "y": 373.83040977687745
       }
     },
     {
       "name": "通讯设施",
-      "u": 290,
-      "d": -100,
-      "elevation": 197.388044,
+      "u": 460,
+      "d": -120,
+      "elevation": 187.999388,
       "screen": {
-        "x": 890,
-        "y": 560.8139346892887
+        "x": 1260,
+        "y": 645.4803020141054
       }
     },
     {
       "name": "主屋生活区",
       "u": 70,
-      "d": -190,
+      "d": -240,
       "elevation": 200,
       "screen": {
-        "x": 670,
-        "y": 583.7867647058823
+        "x": 870,
+        "y": 667.9411764705883
       }
     },
     {
       "name": "拖拉机",
-      "u": -440,
-      "d": -300,
-      "elevation": 158.787928,
+      "u": -500,
+      "d": 170,
+      "elevation": 166.066984,
       "screen": {
-        "x": 160,
-        "y": 654.4527161637895
+        "x": 300,
+        "y": 584.4199475250265
       }
     },
     {
       "name": "小木屋",
-      "u": -195,
-      "d": -325,
-      "elevation": 183.540984,
+      "u": -240,
+      "d": -290,
+      "elevation": 193.754808,
       "screen": {
-        "x": 405,
-        "y": 637.7894180982414
+        "x": 560,
+        "y": 688.0853139184088
       }
     },
     {
       "name": "生活舱",
-      "u": 300,
-      "d": -460,
-      "elevation": 186.676842,
+      "u": 405,
+      "d": -390,
+      "elevation": 186.886016,
       "screen": {
-        "x": 900,
-        "y": 672.9987471216032
+        "x": 1205,
+        "y": 722.9819538940351
       }
     },
     {
       "name": "辅助设施",
-      "u": -230,
-      "d": -480,
-      "elevation": 175.357709,
+      "u": -390,
+      "d": -425,
+      "elevation": 196.243282,
       "screen": {
-        "x": 370,
-        "y": 689.5166229861105
+        "x": 410,
+        "y": 723.9155456189214
       }
     },
     {
       "name": "南瓜地",
-      "u": -170,
-      "d": -620,
-      "elevation": 188.159033,
+      "u": -555,
+      "d": -560,
+      "elevation": 211.978525,
       "screen": {
-        "x": 430,
-        "y": 716.8713047208178
+        "x": 245,
+        "y": 747.0408820837764
       }
     },
     {
       "name": "羊群 / 生活树",
-      "u": 120,
-      "d": -630,
-      "elevation": 197.440817,
+      "u": 30,
+      "d": -660,
+      "elevation": 196.705727,
       "screen": {
-        "x": 720,
-        "y": 710.8000849211359
+        "x": 830,
+        "y": 789.997752320781
       }
     },
     {
       "name": "羊圈",
-      "u": 360,
+      "u": 500,
       "d": -680,
-      "elevation": 184.911525,
+      "elevation": 198.923149,
       "screen": {
-        "x": 960,
-        "y": 736.9712635136585
+        "x": 1300,
+        "y": 793.5328010285203
       }
     },
     {
       "name": "西侧农田路径末端",
-      "u": -490,
-      "d": -420,
-      "elevation": 160.494535,
+      "u": -530,
+      "d": 100,
+      "elevation": 164.430636,
       "screen": {
-        "x": 110,
-        "y": 686.7865083485707
+        "x": 270,
+        "y": 605.8055356167285
       }
     },
     {
       "name": "中央谷底",
       "u": 100,
       "d": 2500,
-      "elevation": -467.767146,
+      "elevation": -479.623079,
       "screen": {
-        "x": 700,
-        "y": 462.73078762883745
+        "x": 900,
+        "y": 544.1017403785243
       }
     },
     {
       "name": "东侧谷底",
       "u": 650,
       "d": 2620,
-      "elevation": -505.536811,
+      "elevation": -436.365422,
       "screen": {
-        "x": 1250,
-        "y": 464.98485371718004
+        "x": 1450,
+        "y": 468.6429984722838
       }
     }
   ],
   "ridges": [
     {
       "id": "west-drift",
-      "name": "西侧叠肩群",
-      "maxElevation": -510,
+      "name": "远层错位长肩",
+      "maxElevation": -350,
       "belowMeadow": true,
-      "clearance": 710,
-      "u": -530.000011,
-      "d": 3449.99988,
+      "clearance": 550,
+      "u": -210.000011,
+      "d": 3109.999945,
       "screen": {
-        "x": 69.99998934583846,
-        "y": 234.30226962287452
+        "x": 589.9999892640684,
+        "y": 247.0972321079986
       }
     },
     {
       "id": "middle-saddle",
-      "name": "西谷近层低脊",
-      "maxElevation": -390,
+      "name": "中层低脊与西向缓肩",
+      "maxElevation": -220,
       "belowMeadow": true,
-      "clearance": 590,
-      "u": -484.999984,
-      "d": 2899.999935,
+      "clearance": 420,
+      "u": 40.000043,
+      "d": 2500.000021,
       "screen": {
-        "x": 115.00001630832264,
-        "y": 274.90951934993916
+        "x": 840.0000431481516,
+        "y": 295.0988311418161
       }
     },
     {
       "id": "near-fold",
-      "name": "主峰与错落缓肩",
-      "maxElevation": -445,
+      "name": "非对称双峰与偏置支脊",
+      "maxElevation": -105,
       "belowMeadow": true,
-      "clearance": 645,
-      "u": 180.000108,
-      "d": 3199.999999,
+      "clearance": 305,
+      "u": 189.999989,
+      "d": 2159.999999,
       "screen": {
-        "x": 780.0001078499365,
-        "y": 242.73319329453375
+        "x": 989.9999891618558,
+        "y": 281.0530422020252
       }
     },
     {
       "id": "east-spur",
-      "name": "东谷退入长肩",
-      "maxElevation": -475,
+      "name": "右近双峰与不等长坡脚",
+      "maxElevation": 5,
       "belowMeadow": true,
-      "clearance": 675,
-      "u": 745.000005,
-      "d": 3259.999978,
+      "clearance": 195,
+      "u": 534.999994,
+      "d": 1590.000032,
       "screen": {
-        "x": 1345.0000052044256,
-        "y": 254.5207213832607
+        "x": 1334.9999944684942,
+        "y": 336.91300144007926
       }
     },
     {
       "id": "quiet-islet",
-      "name": "远谷偏置低丘",
-      "maxElevation": -655,
+      "name": "极远小尺度山岛",
+      "maxElevation": -535,
       "belowMeadow": true,
-      "clearance": 855,
-      "u": -119.999957,
-      "d": 3920.000085,
+      "clearance": 735,
+      "u": 229.999946,
+      "d": 3700.000107,
       "screen": {
-        "x": 480.00004318903666,
-        "y": 240.31935215213662
+        "x": 1029.9999459932617,
+        "y": 257.5074934192345
       }
     },
     {
       "id": "east-low",
-      "name": "后层宽鞍",
-      "maxElevation": -605,
+      "name": "右侧退后低肩",
+      "maxElevation": -335,
       "belowMeadow": true,
-      "clearance": 805,
-      "u": 350.000075,
-      "d": 3789.999988,
+      "clearance": 535,
+      "u": 510.000075,
+      "d": 2960.000086,
       "screen": {
-        "x": 950.0000754377165,
-        "y": 229.1661567319302
+        "x": 1310.0000753968316,
+        "y": 275.17401963736586
       }
     },
     {
       "id": "horizon-west",
       "name": "极远西岭",
-      "maxElevation": -710,
+      "maxElevation": -760,
       "belowMeadow": true,
-      "clearance": 910,
-      "u": -570.000054,
-      "d": 4210.00001,
+      "clearance": 960,
+      "u": -589.999989,
+      "d": 4730.000053,
       "screen": {
-        "x": 29.99994619768688,
-        "y": 210.97394815623886
+        "x": 210.0000109403568,
+        "y": 181.72274711198554
       }
     },
     {
       "id": "horizon-east",
       "name": "极远东岭",
-      "maxElevation": -746.613098,
+      "maxElevation": -810,
       "belowMeadow": true,
-      "clearance": 946.613098,
-      "u": 436.200121,
-      "d": 4229.499998,
+      "clearance": 1010,
+      "u": 759.999957,
+      "d": 4799.999999,
       "screen": {
-        "x": 1036.200120947773,
-        "y": 240.56912876039485
+        "x": 1559.999956647423,
+        "y": 209.86127940719552
       }
     }
   ],
-  "highestViewingRidge": -390,
+  "highestViewingRidge": 5,
   "composition": {
     "homeFoot": {
-      "x": 670,
-      "y": 583.7867647058823
+      "x": 870,
+      "y": 667.9411764705883
     },
-    "homeMaxSlope": 3.300774,
+    "homeMaxSlope": 0.201294,
     "homeHeightRange": [
-      199.06993093063144,
+      199.9846622229422,
       200
     ],
     "mainRidgePeak": {
-      "x": 780,
-      "y": 242.7331930630521
+      "x": 990,
+      "y": 281.05304204577516
     },
     "screenRelationships": {
       "homeCenter": {
-        "x": 670,
-        "y": 583.7867647058823
+        "x": 870,
+        "y": 667.9411764705883
       },
-      "primaryFieldTop": 604.286246,
-      "primaryFieldBelowHomeCenter": 20.499481,
-      "leftParcelMinimumGrassGap": 38.986898,
-      "note": "Measured in the delivered 1200×800 orthographic frame. Other parcels may interleave with the meadow; artistic depth still requires screenshots."
+      "primaryFieldTop": 435.630669,
+      "primaryFieldBelowHomeCenter": -232.310508,
+      "leftParcelMinimumGrassGap": 29.8464,
+      "note": "Measured in the delivered 1600×900 frame. V0.3 below-house/full-frame parcel gates are retired: the approved image has receding, frame-cropped left fields. These values are observations, not art acceptance."
     },
     "placements": [
       {
         "slot": "bridge",
-        "u": -465,
-        "d": 2250,
-        "h": -422.555308,
+        "u": -645,
+        "d": 810,
+        "h": 196.734542,
         "screen": {
-          "x": 135,
-          "y": 490.1404504410656
+          "x": 155,
+          "y": 373.83040977687745
         }
       },
       {
         "slot": "observatory",
-        "u": 290,
-        "d": -100,
-        "h": 197.388044,
+        "u": 460,
+        "d": -120,
+        "h": 187.999388,
         "screen": {
-          "x": 890,
-          "y": 560.8139346892887
+          "x": 1260,
+          "y": 645.4803020141054
         }
       },
       {
         "slot": "home",
         "u": 70,
-        "d": -190,
+        "d": -240,
         "h": 200,
         "screen": {
-          "x": 670,
-          "y": 583.7867647058823
+          "x": 870,
+          "y": 667.9411764705883
         }
       },
       {
         "slot": "tractor",
-        "u": -440,
-        "d": -300,
-        "h": 158.787928,
+        "u": -500,
+        "d": 170,
+        "h": 166.066984,
         "screen": {
-          "x": 160,
-          "y": 654.4527161637895
+          "x": 300,
+          "y": 584.4199475250265
         }
       },
       {
         "slot": "cabin",
-        "u": -195,
-        "d": -325,
-        "h": 183.540984,
+        "u": -240,
+        "d": -290,
+        "h": 193.754808,
         "screen": {
-          "x": 405,
-          "y": 637.7894180982414
+          "x": 560,
+          "y": 688.0853139184088
         }
       },
       {
         "slot": "pod",
-        "u": 300,
-        "d": -460,
-        "h": 186.676842,
+        "u": 405,
+        "d": -390,
+        "h": 186.886016,
         "screen": {
-          "x": 900,
-          "y": 672.9987471216032
+          "x": 1205,
+          "y": 722.9819538940351
         }
       },
       {
         "slot": "grounds",
-        "u": -230,
-        "d": -480,
-        "h": 175.357709,
+        "u": -390,
+        "d": -425,
+        "h": 196.243282,
         "screen": {
-          "x": 370,
-          "y": 689.5166229861105
+          "x": 410,
+          "y": 723.9155456189214
         }
       },
       {
         "slot": "pumpkins",
-        "u": -170,
-        "d": -620,
-        "h": 188.159033,
+        "u": -555,
+        "d": -560,
+        "h": 211.978525,
         "screen": {
-          "x": 430,
-          "y": 716.8713047208178
+          "x": 245,
+          "y": 747.0408820837764
         }
       },
       {
         "slot": "flock",
-        "u": 120,
-        "d": -630,
-        "h": 197.440817,
+        "u": 30,
+        "d": -660,
+        "h": 196.705727,
         "screen": {
-          "x": 720,
-          "y": 710.8000849211359
+          "x": 830,
+          "y": 789.997752320781
         }
       },
       {
         "slot": "pen",
-        "u": 360,
+        "u": 500,
         "d": -680,
-        "h": 184.911525,
+        "h": 198.923149,
         "screen": {
-          "x": 960,
-          "y": 736.9712635136585
+          "x": 1300,
+          "y": 793.5328010285203
         }
       }
     ]
   },
   "route": {
-    "length": 678.263248,
+    "length": 698.894521,
     "startElevation": 200,
-    "endElevation": 160.494535,
-    "maxSlopeDegrees": 10.56312,
-    "maxUphillSlopeDegrees": 0.460315,
-    "maxAdjacentSlopeChangeDegrees": 0.223371,
-    "maxUpStep": 0.00482,
+    "endElevation": 164.430636,
+    "maxSlopeDegrees": 11.615513,
+    "maxUphillSlopeDegrees": 1.478824,
+    "maxAdjacentSlopeChangeDegrees": 0.180657,
+    "maxUpStep": 0.01882,
     "sampleCount": 501
   },
   "continuity": {
     "probeEpsilon": 0.001,
-    "maxTwoSidedHeightGap": 0.001459,
-    "maxExtrapolatedLimitGap": 3.069544618483633e-12,
-    "maxDerivativeGap": 0.000002
+    "maxTwoSidedHeightGap": 0.002852,
+    "maxExtrapolatedLimitGap": 2.8990143619012088e-12,
+    "maxDerivativeGap": 0.000005
   },
   "fieldAttachment": {
     "renderOffset": 0.8,
-    "maxOffsetError": 0.000013,
-    "minRenderedClearance": 0.465531,
-    "maxRenderedClearance": 0.911834,
-    "maxFieldSlopeDegrees": 13.967274
+    "maxOffsetError": 0.00001,
+    "minRenderedClearance": 0.79999,
+    "maxRenderedClearance": 0.80001,
+    "maxFieldSlopeDegrees": 11.48751
   },
   "fieldSamples": [
     {
       "id": "tractor-plot",
-      "min": 158.582453,
-      "max": 177.813943,
+      "min": 163.4568,
+      "max": 198.709942,
       "screenBounds": {
-        "left": 49.994211,
-        "right": 371.404564,
-        "top": 604.286246,
-        "bottom": 692.684385
+        "left": -295,
+        "right": 625,
+        "top": 435.630669,
+        "bottom": 640.229698
       }
     },
     {
       "id": "lower-plot",
-      "min": 171.680236,
-      "max": 205.487641,
+      "min": 169.741741,
+      "max": 208.741623,
       "screenBounds": {
-        "left": -80,
-        "right": 260,
-        "top": 730.781911,
-        "bottom": 784.634966
+        "left": -290,
+        "right": 405.877853,
+        "top": 669.309532,
+        "bottom": 769.872284
       }
     },
     {
       "id": "east-plot",
-      "min": 172.669292,
-      "max": 189.861108,
+      "min": 176.638709,
+      "max": 198.957712,
       "screenBounds": {
-        "left": 941.598167,
-        "right": 1243.685228,
-        "top": 571.466161,
-        "bottom": 654.806355
+        "left": -180,
+        "right": 1150,
+        "top": 388.855416,
+        "bottom": 612.571589
       }
     }
   ],
   "meshReports": {
     "ground": {
-      "vertices": 41216,
-      "triangles": 81600,
+      "vertices": 60501,
+      "triangles": 120000,
       "nonFinite": 0,
       "degenerate": 0,
       "downwardNormals": 0,
       "maxNormalError": 0,
-      "minTriangleArea": 435.290682,
-      "maxEdge": 60.444315,
-      "boundaryEdges": 830,
+      "minTriangleArea": 333.663761,
+      "maxEdge": 46.607756,
+      "boundaryEdges": 1000,
       "nonManifoldEdges": 0
     },
     "west-drift": {
-      "vertices": 300,
-      "triangles": 537,
+      "vertices": 367,
+      "triangles": 667,
       "nonFinite": 0,
       "degenerate": 0,
       "downwardNormals": 0,
       "maxNormalError": 0,
-      "minTriangleArea": 18.840068,
-      "maxEdge": 72.846569,
-      "boundaryEdges": 61,
+      "minTriangleArea": 1.734527,
+      "maxEdge": 80.49383,
+      "boundaryEdges": 65,
       "nonManifoldEdges": 0
     },
     "middle-saddle": {
-      "vertices": 249,
-      "triangles": 446,
+      "vertices": 336,
+      "triangles": 612,
       "nonFinite": 0,
       "degenerate": 0,
       "downwardNormals": 0,
       "maxNormalError": 0,
-      "minTriangleArea": 16.904207,
-      "maxEdge": 93.511907,
-      "boundaryEdges": 50,
-      "nonManifoldEdges": 0
-    },
-    "near-fold": {
-      "vertices": 332,
-      "triangles": 596,
-      "nonFinite": 0,
-      "degenerate": 0,
-      "downwardNormals": 0,
-      "maxNormalError": 0,
-      "minTriangleArea": 0.48372,
-      "maxEdge": 84.026821,
-      "boundaryEdges": 66,
-      "nonManifoldEdges": 0
-    },
-    "east-spur": {
-      "vertices": 305,
-      "triangles": 550,
-      "nonFinite": 0,
-      "degenerate": 0,
-      "downwardNormals": 0,
-      "maxNormalError": 0,
-      "minTriangleArea": 3.273978,
-      "maxEdge": 85.721957,
+      "minTriangleArea": 3.804063,
+      "maxEdge": 109.69982,
       "boundaryEdges": 58,
       "nonManifoldEdges": 0
     },
-    "quiet-islet": {
-      "vertices": 76,
-      "triangles": 124,
+    "near-fold": {
+      "vertices": 538,
+      "triangles": 994,
       "nonFinite": 0,
       "degenerate": 0,
       "downwardNormals": 0,
       "maxNormalError": 0,
-      "minTriangleArea": 23.374665,
-      "maxEdge": 55.538765,
-      "boundaryEdges": 26,
+      "minTriangleArea": 4.95558,
+      "maxEdge": 231.683028,
+      "boundaryEdges": 80,
+      "nonManifoldEdges": 0
+    },
+    "east-spur": {
+      "vertices": 607,
+      "triangles": 1120,
+      "nonFinite": 0,
+      "degenerate": 0,
+      "downwardNormals": 0,
+      "maxNormalError": 0,
+      "minTriangleArea": 3.913645,
+      "maxEdge": 238.316607,
+      "boundaryEdges": 92,
+      "nonManifoldEdges": 0
+    },
+    "quiet-islet": {
+      "vertices": 53,
+      "triangles": 84,
+      "nonFinite": 0,
+      "degenerate": 0,
+      "downwardNormals": 0,
+      "maxNormalError": 0,
+      "minTriangleArea": 12.796271,
+      "maxEdge": 58.730714,
+      "boundaryEdges": 20,
       "nonManifoldEdges": 0
     },
     "east-low": {
-      "vertices": 109,
-      "triangles": 185,
+      "vertices": 202,
+      "triangles": 359,
       "nonFinite": 0,
       "degenerate": 0,
       "downwardNormals": 0,
       "maxNormalError": 0,
-      "minTriangleArea": 13.393539,
-      "maxEdge": 56.918387,
-      "boundaryEdges": 31,
+      "minTriangleArea": 2.812164,
+      "maxEdge": 99.378455,
+      "boundaryEdges": 43,
       "nonManifoldEdges": 0
     },
     "horizon-west": {
-      "vertices": 270,
-      "triangles": 462,
+      "vertices": 585,
+      "triangles": 1068,
       "nonFinite": 0,
       "degenerate": 0,
       "downwardNormals": 0,
       "maxNormalError": 0,
-      "minTriangleArea": 4.122211,
-      "maxEdge": 60.023261,
-      "boundaryEdges": 76,
+      "minTriangleArea": 24.464109,
+      "maxEdge": 107.337228,
+      "boundaryEdges": 100,
       "nonManifoldEdges": 0
     },
     "horizon-east": {
-      "vertices": 200,
-      "triangles": 323,
+      "vertices": 598,
+      "triangles": 1095,
       "nonFinite": 0,
       "degenerate": 0,
       "downwardNormals": 0,
       "maxNormalError": 0,
-      "minTriangleArea": 16.675416,
-      "maxEdge": 53.014342,
-      "boundaryEdges": 75,
+      "minTriangleArea": 8.307456,
+      "maxEdge": 105.306902,
+      "boundaryEdges": 99,
       "nonManifoldEdges": 0
     },
     "tractor-plot": {
@@ -562,8 +1272,8 @@
       "degenerate": 0,
       "downwardNormals": 0,
       "maxNormalError": 0,
-      "minTriangleArea": 13.29081,
-      "maxEdge": 10.33284,
+      "minTriangleArea": 51.146239,
+      "maxEdge": 26.781905,
       "boundaryEdges": 168,
       "nonManifoldEdges": 0
     },
@@ -574,8 +1284,8 @@
       "degenerate": 0,
       "downwardNormals": 0,
       "maxNormalError": 0,
-      "minTriangleArea": 5.311978,
-      "maxEdge": 7.206812,
+      "minTriangleArea": 22.583431,
+      "maxEdge": 22.003148,
       "boundaryEdges": 98,
       "nonManifoldEdges": 0
     },
@@ -586,8 +1296,8 @@
       "degenerate": 0,
       "downwardNormals": 0,
       "maxNormalError": 0,
-      "minTriangleArea": 5.775434,
-      "maxEdge": 7.197064,
+      "minTriangleArea": 22.674535,
+      "maxEdge": 22.130894,
       "boundaryEdges": 98,
       "nonManifoldEdges": 0
     },
@@ -598,8 +1308,8 @@
       "degenerate": 0,
       "downwardNormals": 0,
       "maxNormalError": 0,
-      "minTriangleArea": 6.095876,
-      "maxEdge": 7.103394,
+      "minTriangleArea": 22.407034,
+      "maxEdge": 22.156215,
       "boundaryEdges": 98,
       "nonManifoldEdges": 0
     },
@@ -610,8 +1320,8 @@
       "degenerate": 0,
       "downwardNormals": 0,
       "maxNormalError": 0,
-      "minTriangleArea": 6.226574,
-      "maxEdge": 7.011994,
+      "minTriangleArea": 21.786653,
+      "maxEdge": 22.088572,
       "boundaryEdges": 98,
       "nonManifoldEdges": 0
     },
@@ -622,8 +1332,8 @@
       "degenerate": 0,
       "downwardNormals": 0,
       "maxNormalError": 0,
-      "minTriangleArea": 6.16402,
-      "maxEdge": 7.156925,
+      "minTriangleArea": 20.889313,
+      "maxEdge": 22.193773,
       "boundaryEdges": 98,
       "nonManifoldEdges": 0
     },
@@ -634,8 +1344,8 @@
       "degenerate": 0,
       "downwardNormals": 0,
       "maxNormalError": 0,
-      "minTriangleArea": 5.94946,
-      "maxEdge": 7.202807,
+      "minTriangleArea": 19.887257,
+      "maxEdge": 22.458234,
       "boundaryEdges": 98,
       "nonManifoldEdges": 0
     },
@@ -646,8 +1356,8 @@
       "degenerate": 0,
       "downwardNormals": 0,
       "maxNormalError": 0,
-      "minTriangleArea": 5.660879,
-      "maxEdge": 7.150594,
+      "minTriangleArea": 19.005245,
+      "maxEdge": 22.75856,
       "boundaryEdges": 98,
       "nonManifoldEdges": 0
     },
@@ -658,8 +1368,8 @@
       "degenerate": 0,
       "downwardNormals": 0,
       "maxNormalError": 0,
-      "minTriangleArea": 13.470322,
-      "maxEdge": 9.263519,
+      "minTriangleArea": 37.850699,
+      "maxEdge": 15.522367,
       "boundaryEdges": 168,
       "nonManifoldEdges": 0
     },
@@ -670,8 +1380,8 @@
       "degenerate": 0,
       "downwardNormals": 0,
       "maxNormalError": 0,
-      "minTriangleArea": 5.524557,
-      "maxEdge": 7.607453,
+      "minTriangleArea": 14.054139,
+      "maxEdge": 15.47287,
       "boundaryEdges": 98,
       "nonManifoldEdges": 0
     },
@@ -682,8 +1392,8 @@
       "degenerate": 0,
       "downwardNormals": 0,
       "maxNormalError": 0,
-      "minTriangleArea": 5.211362,
-      "maxEdge": 6.96207,
+      "minTriangleArea": 14.626437,
+      "maxEdge": 15.424829,
       "boundaryEdges": 98,
       "nonManifoldEdges": 0
     },
@@ -694,8 +1404,8 @@
       "degenerate": 0,
       "downwardNormals": 0,
       "maxNormalError": 0,
-      "minTriangleArea": 5.139538,
-      "maxEdge": 6.432415,
+      "minTriangleArea": 15.20473,
+      "maxEdge": 15.358499,
       "boundaryEdges": 98,
       "nonManifoldEdges": 0
     },
@@ -706,8 +1416,8 @@
       "degenerate": 0,
       "downwardNormals": 0,
       "maxNormalError": 0,
-      "minTriangleArea": 5.056121,
-      "maxEdge": 6.067861,
+      "minTriangleArea": 15.695137,
+      "maxEdge": 15.25947,
       "boundaryEdges": 98,
       "nonManifoldEdges": 0
     },
@@ -718,8 +1428,8 @@
       "degenerate": 0,
       "downwardNormals": 0,
       "maxNormalError": 0,
-      "minTriangleArea": 4.840004,
-      "maxEdge": 6.345595,
+      "minTriangleArea": 16.049732,
+      "maxEdge": 15.129923,
       "boundaryEdges": 98,
       "nonManifoldEdges": 0
     },
@@ -730,8 +1440,8 @@
       "degenerate": 0,
       "downwardNormals": 0,
       "maxNormalError": 0,
-      "minTriangleArea": 4.941638,
-      "maxEdge": 6.889869,
+      "minTriangleArea": 16.234424,
+      "maxEdge": 15.080337,
       "boundaryEdges": 98,
       "nonManifoldEdges": 0
     },
@@ -742,8 +1452,8 @@
       "degenerate": 0,
       "downwardNormals": 0,
       "maxNormalError": 0,
-      "minTriangleArea": 5.290205,
-      "maxEdge": 7.513561,
+      "minTriangleArea": 16.261241,
+      "maxEdge": 15.068407,
       "boundaryEdges": 98,
       "nonManifoldEdges": 0
     },
@@ -754,8 +1464,8 @@
       "degenerate": 0,
       "downwardNormals": 0,
       "maxNormalError": 0,
-      "minTriangleArea": 8.338789,
-      "maxEdge": 9.762742,
+      "minTriangleArea": 39.099725,
+      "maxEdge": 33.19014,
       "boundaryEdges": 168,
       "nonManifoldEdges": 0
     },
@@ -766,8 +1476,8 @@
       "degenerate": 0,
       "downwardNormals": 0,
       "maxNormalError": 0,
-      "minTriangleArea": 4.6423,
-      "maxEdge": 7.059119,
+      "minTriangleArea": 14.389965,
+      "maxEdge": 31.057263,
       "boundaryEdges": 98,
       "nonManifoldEdges": 0
     },
@@ -778,8 +1488,8 @@
       "degenerate": 0,
       "downwardNormals": 0,
       "maxNormalError": 0,
-      "minTriangleArea": 4.871387,
-      "maxEdge": 7.031038,
+      "minTriangleArea": 14.968594,
+      "maxEdge": 31.320706,
       "boundaryEdges": 98,
       "nonManifoldEdges": 0
     },
@@ -790,8 +1500,8 @@
       "degenerate": 0,
       "downwardNormals": 0,
       "maxNormalError": 0,
-      "minTriangleArea": 4.968903,
-      "maxEdge": 6.91145,
+      "minTriangleArea": 15.729242,
+      "maxEdge": 31.585747,
       "boundaryEdges": 98,
       "nonManifoldEdges": 0
     },
@@ -802,8 +1512,8 @@
       "degenerate": 0,
       "downwardNormals": 0,
       "maxNormalError": 0,
-      "minTriangleArea": 4.869678,
-      "maxEdge": 6.802917,
+      "minTriangleArea": 16.564244,
+      "maxEdge": 31.825583,
       "boundaryEdges": 98,
       "nonManifoldEdges": 0
     },
@@ -814,8 +1524,8 @@
       "degenerate": 0,
       "downwardNormals": 0,
       "maxNormalError": 0,
-      "minTriangleArea": 4.563249,
-      "maxEdge": 6.815185,
+      "minTriangleArea": 16.251445,
+      "maxEdge": 32.021105,
       "boundaryEdges": 98,
       "nonManifoldEdges": 0
     },
@@ -826,8 +1536,8 @@
       "degenerate": 0,
       "downwardNormals": 0,
       "maxNormalError": 0,
-      "minTriangleArea": 4.100426,
-      "maxEdge": 6.624394,
+      "minTriangleArea": 15.471039,
+      "maxEdge": 32.153643,
       "boundaryEdges": 98,
       "nonManifoldEdges": 0
     },
@@ -838,57 +1548,21 @@
       "degenerate": 0,
       "downwardNormals": 0,
       "maxNormalError": 0,
-      "minTriangleArea": 3.544947,
-      "maxEdge": 6.231325,
+      "minTriangleArea": 14.92954,
+      "maxEdge": 32.218925,
       "boundaryEdges": 98,
       "nonManifoldEdges": 0
     },
-    "pasture-back-shoulder": {
-      "vertices": 1095,
-      "triangles": 2016,
+    "staticCloudSea": {
+      "vertices": 27531,
+      "triangles": 54400,
       "nonFinite": 0,
       "degenerate": 0,
       "downwardNormals": 0,
       "maxNormalError": 0,
-      "minTriangleArea": 7.09236,
-      "maxEdge": 35.149313,
-      "boundaryEdges": 172,
-      "nonManifoldEdges": 0
-    },
-    "west-shoulder": {
-      "vertices": 1095,
-      "triangles": 2016,
-      "nonFinite": 0,
-      "degenerate": 0,
-      "downwardNormals": 0,
-      "maxNormalError": 0,
-      "minTriangleArea": 4.33507,
-      "maxEdge": 21.901403,
-      "boundaryEdges": 172,
-      "nonManifoldEdges": 0
-    },
-    "near-right-bank": {
-      "vertices": 1095,
-      "triangles": 2016,
-      "nonFinite": 0,
-      "degenerate": 0,
-      "downwardNormals": 0,
-      "maxNormalError": 0,
-      "minTriangleArea": 11.382536,
-      "maxEdge": 31.196829,
-      "boundaryEdges": 172,
-      "nonManifoldEdges": 0
-    },
-    "foreground-fold": {
-      "vertices": 1095,
-      "triangles": 2016,
-      "nonFinite": 0,
-      "degenerate": 0,
-      "downwardNormals": 0,
-      "maxNormalError": 0,
-      "minTriangleArea": 19.344696,
-      "maxEdge": 44.043005,
-      "boundaryEdges": 172,
+      "minTriangleArea": 364.674609,
+      "maxEdge": 44.368242,
+      "boundaryEdges": 660,
       "nonManifoldEdges": 0
     },
     "farm-access-track": {
@@ -898,8 +1572,8 @@
       "degenerate": 0,
       "downwardNormals": 0,
       "maxNormalError": 0,
-      "minTriangleArea": 6.293919,
-      "maxEdge": 11.400565,
+      "minTriangleArea": 7.292843,
+      "maxEdge": 11.824932,
       "boundaryEdges": 204,
       "nonManifoldEdges": 0
     }
@@ -908,14 +1582,14 @@
     "azimuthDegrees": 45,
     "elevationDegrees": 16.44460704375564,
     "slopes": [
-      0.2830882352941187,
+      0.2830882352941171,
       -0.2830882352941171
     ],
     "anglesDegrees": [
-      15.806193600678524,
+      15.806193600678437,
       -15.806193600678437
     ],
-    "maxSlopeError": 1.0547118733938987e-15
+    "maxSlopeError": 5.551115123125783e-16
   },
   "limitations": [
     "Open mesh boundaries are intentional, outside the view or buried below the valley floor; no vertical island skirts.",

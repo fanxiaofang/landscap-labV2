@@ -1,5 +1,5 @@
 import { groundHeight } from '../terrain/layout';
-import { projectPoint } from '../world/projection';
+import { projectPoint, FRAME, frameMapping, type Frame } from '../world/projection';
 import { SCENE_PLACEMENTS, type ScenePlacement } from './placements';
 
 const q=Math.SQRT1_2;
@@ -38,16 +38,17 @@ function shape(placement:ScenePlacement) {
 }
 
 /** One serialization serves the live overlay and PNG export; no formal artwork is referenced. */
-export function proxySvg() {
+export function proxySvg(frame:Frame=FRAME) {
   const shapes=[...SCENE_PLACEMENTS].sort((a,b)=>b.d-a.d).map(placement=>{
     const vertices=corners(placement);
     const highest=Math.max(...vertices.map(p=>p.h));
     const label=projectPoint(placement.u,placement.d,highest+placement.height+(placement.kind==='bridge'?30:10));
     return `<g data-proxy-slot="${placement.slot}">${shape(placement)}<text x="${number(label.x)}" y="${number(label.y)}" text-anchor="middle" fill="#364439" stroke="#e8edda" stroke-opacity=".9" stroke-width="3" paint-order="stroke" font-family="Microsoft YaHei,Segoe UI,sans-serif" font-size="${placement.slot==='home'?12:10}">${placement.name}</text></g>`;
   }).join('');
-  return `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="800" viewBox="0 0 1200 800">${shapes}</svg>`;
+  const {scale,offsetY}=frameMapping(frame);
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${frame.width}" height="${frame.height}" viewBox="0 0 ${frame.width} ${frame.height}"><g transform="translate(0 ${offsetY}) scale(${scale})">${shapes}</g></svg>`;
 }
-export function proxyUrl() {return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(proxySvg())}`;}
-export function Proxy() {
-  return <img className="proxy-overlay" src={proxyUrl()} alt="Proxy 占位布局：主屋、拖拉机、桥与火车、通讯设施及生活辅助区域"/>;
+export function proxyUrl(frame:Frame=FRAME) {return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(proxySvg(frame))}`;}
+export function Proxy({frame=FRAME}:{frame?:Frame}) {
+  return <img className="proxy-overlay" src={proxyUrl(frame)} alt="Proxy 占位布局：主屋、拖拉机、桥与火车、通讯设施及生活辅助区域"/>;
 }

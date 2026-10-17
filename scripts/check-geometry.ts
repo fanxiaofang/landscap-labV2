@@ -2,7 +2,9 @@ import fs from 'node:fs/promises';
 import { CatmullRomCurve3, Vector3, type BufferGeometry, Mesh } from 'three';
 import { groundHeight, shoulderDepth, shoulderWidth, HOME_HEIGHT, RIDGES, WALK_ROUTE, FIELDS, fieldPoint, renderedGroundHeight } from '../src/terrain/layout';
 import { buildGround, buildFields, buildMeadowZones, ridgeGeometry } from '../src/terrain/geometry';
-import { measureProjection, projectPoint } from '../src/world/projection';
+import { measureProjection, projectPoint, worldPoint, createOverviewCamera, FRAME, INTEGRATION_FRAME } from '../src/world/projection';
+import { buildCloudSea } from '../src/world/cloudSea';
+import { REFERENCE_CONTOURS, REFERENCE_BANDS } from '../src/composition/Contours';
 import { sceneLayout } from '../src/composition/placements';
 
 const round=(n:number)=>Number(n.toFixed(6));
@@ -67,7 +69,7 @@ fields.children.filter(c=>c.name.endsWith('plot')).forEach((m)=>{
   const mesh=m as Mesh,p=mesh.geometry.getAttribute('position');
   for(let i=0;i<p.count;i++){
     const u=(p.getX(i)-p.getZ(i))*Math.SQRT1_2,d=-(p.getX(i)+p.getZ(i))*Math.SQRT1_2;
-    maxFieldOffsetError=Math.max(maxFieldOffsetError,Math.abs(p.getY(i)-groundHeight(u,d)-.8));
+    maxFieldOffsetError=Math.max(maxFieldOffsetError,Math.abs(p.getY(i)-renderedGroundHeight(u,d)-.8));
     const clearance=p.getY(i)-renderedGroundHeight(u,d);
     minRenderedFieldClearance=Math.min(minRenderedFieldClearance,clearance);maxRenderedFieldClearance=Math.max(maxRenderedFieldClearance,clearance);
     const du=(groundHeight(u+.1,d)-groundHeight(u-.1,d))/.2,dd=(groundHeight(u,d+.1)-groundHeight(u,d-.1))/.2;
@@ -75,6 +77,7 @@ fields.children.filter(c=>c.name.endsWith('plot')).forEach((m)=>{
   }
 });
 fields.traverse(o=>{if(o instanceof Mesh){o.geometry.dispose();(o.material as any).dispose();}});
+const clouds=buildCloudSea();clouds.traverse(o=>{if(o instanceof Mesh){meshReports.staticCloudSea=auditMesh(o.geometry);o.geometry.dispose();(o.material as any).dispose();}});
 const zones=buildMeadowZones();zones.traverse(o=>{if(o instanceof Mesh){meshReports[o.name]=auditMesh(o.geometry);o.geometry.dispose();(o.material as any).dispose();}});
 const projectedFields=FIELDS.map(f=>{
   const points=[];
@@ -107,9 +110,25 @@ for(let x=10;x<1190;x+=10){
 }
 const projectedFieldGap=Math.min(...fieldGaps);
 // Actual final-frame projection, without the original SVG's unrelated 0.66 source transform.
-const screenRelationships={homeCenter:home.target,primaryFieldTop:round(primaryField.bounds.top),primaryFieldBelowHomeCenter:round(primaryField.bounds.top-home.target.y),leftParcelMinimumGrassGap:round(projectedFieldGap),note:'Measured in the delivered 1200×800 orthographic frame. Other parcels may interleave with the meadow; artistic depth still requires screenshots.'};
+const screenRelationships={homeCenter:home.target,primaryFieldTop:round(primaryField.bounds.top),primaryFieldBelowHomeCenter:round(primaryField.bounds.top-home.target.y),leftParcelMinimumGrassGap:round(projectedFieldGap),note:'Measured in the delivered 1600×900 frame. V0.3 below-house/full-frame parcel gates are retired: the approved image has receding, frame-cropped left fields. These values are observations, not art acceptance.'};
 const composition={homeFoot:home.target,homeMaxSlope:round(homeMaxSlope),homeHeightRange:homeSupport.map(p=>p.h).reduce((a,h)=>[Math.min(a[0],h),Math.max(a[1],h)],[Infinity,-Infinity]),mainRidgePeak:projectPoint(mainPeak.u,mainPeak.d,mainPeak.h),screenRelationships,placements:placements.map(a=>({slot:a.slot,u:a.u,d:a.d,h:round(a.h),screen:a.target}))};
+let maxCameraError=0;
+for(const frame of [FRAME,INTEGRATION_FRAME]){
+  const camera=createOverviewCamera(frame);
+  for(const p of samples){
+    const expected=projectPoint(p.u,p.d,p.elevation,frame),actual=worldPoint(p.u,p.d,p.elevation).project(camera);
+    maxCameraError=Math.max(maxCameraError,Math.abs(expected.x-(actual.x+1)*frame.width/2),Math.abs(expected.y-(1-actual.y)*frame.height/2));
+  }
+}
+const foregroundBoundary=Array.from({length:161},(_,i)=>{
+  const u=-800+i*10;let y=Infinity;
+  for(let d=-1000;d<shoulderDepth(u)+700;d+=2)y=Math.min(y,projectPoint(u,d,groundHeight(u,d)).y);
+  return {x:i/160,y:y/900};
+});
+const currentForeground=1-foregroundBoundary.slice(1).reduce((sum,p,i)=>sum+(p.x-foregroundBoundary[i].x)*(p.y+foregroundBoundary[i].y)/2,0);
+const visualObservations={reference:'autumn-approved.png',referenceBasis:'manual normalized contour tracing; approximate, not semantic segmentation',referenceBands:REFERENCE_BANDS,currentForeground,foregroundDeltaPercentagePoints:(currentForeground-REFERENCE_BANDS.foreground)*100,foregroundBoundary,referenceForeground:REFERENCE_CONTOURS[1].points,artApproval:'PENDING_AUTHOR_REVIEW',retiredV03ArtGates:['primary field below home in screen space','primary field fully inside frame','left parcel gap >20 px'],retirementReason:'Approved autumn image uses receding farmland, cropped at the left edge. These historical layout choices cannot gate the new composition.'};
 const assertions={
+  bothFrameProjectionsMatchCamera:maxCameraError<1e-8,
   peaksBelowHome:ridgeReports.every(r=>r.belowMeadow),
   routeDescendsOverall:routeSamples.at(-1)!.elevation<routeSamples[0].elevation-30,
   routeRollingRiseUnder2Degrees:Math.atan(maxUphillSlope)*180/Math.PI<2,
@@ -123,16 +142,19 @@ const assertions={
   validMeshes:Object.values(meshReports).every(m=>m.nonFinite===0&&m.degenerate===0&&m.downwardNormals===0&&m.nonManifoldEdges===0&&m.maxNormalError<.001),
   projectionMatchesGroundAxes:projection.maxSlopeError<1e-8,
   homeRemainsStable:homeMaxSlope<4,
-  primaryFieldVisuallyBelowHome:primaryField.bounds.top-home.target.y>15,
-  primaryFieldFullyInFrame:primaryField.bounds.left>0&&primaryField.bounds.right<1200&&primaryField.bounds.top>0&&primaryField.bounds.bottom<800,
-  leftParcelsSeparatedInProjection:fieldGaps.length>5&&projectedFieldGap>20,
+
+
+
   allNarrativeSlotsPresent:placements.length===10&&new Set(placements.map(a=>a.slot)).size===10,
 };
-const report={version:'0.3',units:'study units, not metres',cloudSeaRendered:false,passed:Object.values(assertions).every(Boolean),assertions,samples,ridges:ridgeReports,highestViewingRidge:Math.max(...ridgeReports.slice(0,6).map(p=>p.maxElevation)),composition,route:{length:round(distance),startElevation:routeSamples[0].elevation,endElevation:routeSamples.at(-1)!.elevation,maxSlopeDegrees:round(Math.atan(maxSlope)*180/Math.PI),maxUphillSlopeDegrees:round(Math.atan(maxUphillSlope)*180/Math.PI),maxAdjacentSlopeChangeDegrees:round(maxSlopeDelta),maxUpStep:round(maxUpStep),sampleCount:501},continuity:{probeEpsilon:.001,maxTwoSidedHeightGap:round(maxHeightGap),maxExtrapolatedLimitGap:maxBoundaryLimitGap,maxDerivativeGap:round(maxDerivativeGap)},fieldAttachment:{renderOffset:.8,maxOffsetError:round(maxFieldOffsetError)},fieldSamples,meshReports,projection,limitations:['Open mesh boundaries are intentional, outside the view or buried below the valley floor; no vertical island skirts.','These checks validate geometry and specific projected relationships, not artistic approval.','Generic narrative slots are independent of formal SVG assets.','Static SVG composition does not validate room transitions, interaction, dynamic parallax or individual foot collisions.']};
-await fs.mkdir('evidence',{recursive:true});
+const report={version:'0.4',units:'study units, not metres',cloudSeaMode:'optional static mesh; both clear and cloud previews required',passed:Object.values(assertions).every(Boolean),artApproval:'PENDING_AUTHOR_REVIEW',visualObservations,maxCameraError,assertions,samples,ridges:ridgeReports,highestViewingRidge:Math.max(...ridgeReports.slice(0,6).map(p=>p.maxElevation)),composition,route:{length:round(distance),startElevation:routeSamples[0].elevation,endElevation:routeSamples.at(-1)!.elevation,maxSlopeDegrees:round(Math.atan(maxSlope)*180/Math.PI),maxUphillSlopeDegrees:round(Math.atan(maxUphillSlope)*180/Math.PI),maxAdjacentSlopeChangeDegrees:round(maxSlopeDelta),maxUpStep:round(maxUpStep),sampleCount:501},continuity:{probeEpsilon:.001,maxTwoSidedHeightGap:round(maxHeightGap),maxExtrapolatedLimitGap:maxBoundaryLimitGap,maxDerivativeGap:round(maxDerivativeGap)},fieldAttachment:{renderOffset:.8,maxOffsetError:round(maxFieldOffsetError)},fieldSamples,meshReports,projection,limitations:['Open mesh boundaries are intentional, outside the view or buried below the valley floor; no vertical island skirts.','These checks validate geometry and specific projected relationships, not artistic approval.','Generic narrative slots are independent of formal SVG assets.','Static SVG composition does not validate room transitions, interaction, dynamic parallax or individual foot collisions.']};
+await fs.mkdir('evidence/v04',{recursive:true});
 Object.assign(report.fieldAttachment,{minRenderedClearance:round(minRenderedFieldClearance),maxRenderedClearance:round(maxRenderedFieldClearance),maxFieldSlopeDegrees:round(maxFieldSlopeDegrees)});
 await fs.writeFile('public/geometry-report.json',JSON.stringify(report,null,2));
 await fs.writeFile('evidence/geometry-report.json',JSON.stringify(report,null,2));
-await fs.writeFile('evidence/walk-route.csv','t,u,d,elevation,distance,slopeDegrees\n'+routeSamples.map(p=>Object.values(p).join(',')).join('\n'));
+await fs.writeFile('evidence/v04/geometry-report.json',JSON.stringify(report,null,2));
+await fs.writeFile('evidence/v04/composition-observations.json',JSON.stringify(visualObservations,null,2));
+await fs.writeFile('evidence/v04/walk-route.csv','t,u,d,elevation,distance,slopeDegrees\n'+routeSamples.map(p=>Object.values(p).join(',')).join('\n'));
+await fs.copyFile('evidence/v04/walk-route.csv','evidence/walk-route.csv');
 console.log(JSON.stringify({passed:report.passed,assertions,screenRelationships,route:report.route,homeMaxSlope:round(homeMaxSlope),continuity:report.continuity,fieldAttachment:report.fieldAttachment,projection},null,2));
 if(!report.passed)process.exitCode=1;
