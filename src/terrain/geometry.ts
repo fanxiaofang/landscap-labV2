@@ -1,8 +1,10 @@
 import { BufferGeometry, Float32BufferAttribute, Vector3, Color, Mesh, MeshBasicMaterial, Group, CatmullRomCurve3 } from 'three';
-import Delaunator from 'delaunator';
+import { ridgeGeometry } from './ridgeSurface';
+export { ridgeGeometry } from './ridgeSurface';
+import { cloudHeight, cloudColor } from '../world/cloudField';
 import { worldPoint } from '../world/projection';
 import { PALETTE } from '../world/environment';
-import { groundHeight, valleyHeight, shoulderDepth, smooth, FIELDS, fieldPoint, RIDGES, GROUND_GRID, WALK_ROUTE, renderedGroundHeight, type RidgeDefinition } from './layout';
+import { groundHeight, valleyHeight, shoulderDepth, smooth, FIELDS, fieldPoint, RIDGES, GROUND_GRID, WALK_ROUTE, renderedGroundHeight } from './layout';
 
 export function indexedSurface(cols:number,rows:number,sample:(s:number,t:number)=>Vector3) {
   const positions:number[]=[],indices:number[]=[];
@@ -48,7 +50,8 @@ function groundColor(u:number,d:number,n:Vector3) {
     const half=band.width*(.05+.95*Math.sin(s*Math.PI))/2;
     c.lerp(new Color(band.color),1-smooth(half-18,half+18,Math.abs(d-edge)));
   }
-  c.lerp(new Color(PALETTE.shoulder),smooth(shoulder-100,shoulder+750,d));
+  c.lerp(new Color(PALETTE.shoulder),smooth(shoulder-30,shoulder+600,d));
+  c.lerp(new Color('#596847'),.30*smooth(shoulder+100,shoulder+740,d)*(1-smooth(shoulder+740,shoulder+1450,d)));
   c.lerp(new Color(PALETTE.valley),smooth(shoulder+600,shoulder+1450,d));
   c.lerp(new Color(PALETTE.farValley),smooth(2600,4300,d));
   c.multiplyScalar(.82+.18*Math.max(0,n.dot(groundLight)));
@@ -62,74 +65,11 @@ export function buildGround() {
   return mesh('continuous-meadow-farm-valley',g);
 }
 
-export function ridgeGeometry(def:RidgeDefinition) {
-  const chains=[def.points,...(def.branches??[])];
-  const all=chains.flat();
-  const extent=Math.max(1,...(def.flanks??[1,1]));
-  const minU=Math.min(...all.map(p=>p.u-p.w*extent)),maxU=Math.max(...all.map(p=>p.u+p.w*extent));
-  const minD=Math.min(...all.map(p=>p.d-p.w*extent*1.5)),maxD=Math.max(...all.map(p=>p.d+p.w*extent*1.5));
-  // A small, independent surface around an explicitly authored branching ridge network.
-  // Distances use a stretched depth axis to give long shoulders, rather than radial cones.
-  const segments=chains.flatMap(chain=>chain.slice(1).map((b,i)=>({a:chain[i],b})));
-  const heightAt=(u:number,d:number)=>{
-    const base=valleyHeight(u,d)-5;
-    let height=base;
-    for(const {a,b} of segments){
-      const dx=b.u-a.u,dz=(b.d-a.d)/1.5;
-      const f=Math.max(0,Math.min(1,((u-a.u)*dx+(d-a.d)/1.5*dz)/(dx*dx+dz*dz)));
-      const cu=a.u+f*(b.u-a.u),cd=a.d+f*(b.d-a.d),crest=a.h+f*(b.h-a.h),width=a.w+f*(b.w-a.w);
-      const length=Math.hypot(dx,dz),offsetU=u-cu,offsetD=(d-cd)/1.5;
-      const across=(dx*offsetD-dz*offsetU)/length,along=(dx*offsetU+dz*offsetD)/length;
-      // Only stretch the cross-slope component. Scaling the end-cap radius by a
-      // side sign would introduce a height discontinuity beyond a segment end.
-      const radius=Math.hypot(along,across/(def.flanks?.[across>0?0:1]??1))/width;
-      // A compact smooth apron reaches the valley with a horizontal tangent.
-      const influence=radius<.22?1-radius*.95:radius<.62?.791-(radius-.22)*1.5:radius<1?.191*((1-radius)/.38)**2:0;
-      height=Math.max(height,base+Math.max(0,crest-base)*influence);
-    }
-    return height;
-  };
-  const sites:[number,number][]=[];
-  // Seed the exact crests and their parallel slope shoulders before triangulating.
-  // This removes the staircase silhouette of a regular grid crossing a narrow ridge.
-  for(const {a,b} of segments){
-    const steps=Math.max(2,Math.ceil(Math.hypot(b.u-a.u,b.d-a.d)/28));
-    for(let i=0;i<=steps;i++){
-      const t=i/steps,u=a.u+(b.u-a.u)*t,d=a.d+(b.d-a.d)*t;
-      sites.push([u,d]);
-      const len=Math.hypot(b.u-a.u,b.d-a.d),nu=-(b.d-a.d)/len,nd=(b.u-a.u)/len;
-      for(const side of [-1,1])sites.push([u+nu*side*28,d+nd*side*28]);
-    }
-  }
-  const cols=Math.ceil((maxU-minU)/36),rows=Math.ceil((maxD-minD)/46);
-  for(let j=0;j<=rows;j++)for(let i=0;i<=cols;i++){
-    const u=minU+(maxU-minU)*(i+(j%2)*.32)/cols,d=minD+(maxD-minD)*j/rows;
-    sites.push([u,d]);
-  }
-  const unique=[...new Map(sites.map(p=>[`${p[0].toFixed(3)},${p[1].toFixed(3)}`,p])).values()];
-  const elevations=unique.map(([u,d])=>heightAt(u,d));
-  const triangulation=Delaunator.from(unique);
-  const positions=unique.flatMap(([u,d],i)=>worldPoint(u,d,elevations[i]).toArray());
-  const indices:number[]=[];
-  for(let i=0;i<triangulation.triangles.length;i+=3){
-    const ids=[triangulation.triangles[i],triangulation.triangles[i+1],triangulation.triangles[i+2]];
-    // Buried portions must not extend past the valley's horizon as rectangular cards.
-    if(ids.every(k=>elevations[k]<valleyHeight(...unique[k])+.15))continue;
-    const [a,b,c]=ids.map(k=>worldPoint(unique[k][0],unique[k][1],elevations[k]));
-    if(b.clone().sub(a).cross(c.clone().sub(a)).y<0)[ids[1],ids[2]]=[ids[2],ids[1]];
-    indices.push(...ids);
-  }
-  // Compact unused sites so every normal in the exported surface is meaningful.
-  const used=[...new Set(indices)],remap=new Map(used.map((v,i)=>[v,i]));
-  const g=new BufferGeometry();
-  g.setAttribute('position',new Float32BufferAttribute(used.flatMap(k=>positions.slice(k*3,k*3+3)),3));
-  g.setIndex(indices.map(i=>remap.get(i)!));g.computeVertexNormals();return g;
-}
 export function buildRidges() {
   const group=new Group();group.name='authored-ridge-masses';
-  const light=new Vector3(.6,.75,-.2).normalize();
+  const light=new Vector3(.25,.8,-.6).normalize();
   for(const def of RIDGES){
-    const indexed=ridgeGeometry(def),g=indexed.toNonIndexed();indexed.dispose();g.computeVertexNormals();
+    const g=ridgeGeometry(def);
     colorize(g,(p,n)=>{
       const {u,d}=plan(p);
       const facing=Math.max(0,n.dot(light));
@@ -142,7 +82,15 @@ export function buildRidges() {
       c.lerp(base,1-smooth(0,38,p.y-valleyHeight(u,d)));
       return c;
     });
-    group.add(mesh(def.id,g));
+    const clear=g.getAttribute('color'),mist=clear.clone(),position=g.getAttribute('position');
+    for(let i=0;i<position.count;i++){
+      const v=new Vector3().fromBufferAttribute(position,i),{u,d}=plan(v);
+      const contact=1-smooth(0,35,v.y-cloudHeight(u,d));
+      const c=new Color().fromBufferAttribute(clear,i).lerp(cloudColor(u,d),contact*.62);
+      mist.setXYZ(i,c.r,c.g,c.b);
+    }
+    const m=mesh(def.id,g);m.userData.clearColors=clear;m.userData.cloudColors=mist;
+    group.add(m);
   }
   return group;
 }

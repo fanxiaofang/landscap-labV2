@@ -1,0 +1,66 @@
+{
+  "version": "0.5",
+  "passed": true,
+  "artApproval": "PENDING_AUTHOR_REVIEW",
+  "integrationEnabled": false,
+  "browser": "141.0.7390.37",
+  "renderer": "Chromium SwiftShader",
+  "checks": [
+    "Default benchmark uses all five structure references and the unchanged autumn image, without Proxy or formal assets.",
+    "Both 1600×900 exports are deterministic; toggling clouds restores the exact original clear terrain and material colours.",
+    "Side-by-side, overlay, wipe and actual PNG export button work without changing the geometry export.",
+    "Both frames remain aligned at 1600, 1024, 768 and 390 px; zero browser errors or formal asset requests."
+  ],
+  "responsive": [
+    {
+      "width": 1600,
+      "current": {
+        "width": 614,
+        "height": 345.375
+      },
+      "reference": {
+        "width": 614,
+        "height": 345.375
+      },
+      "scroll": 1600
+    },
+    {
+      "width": 1024,
+      "current": {
+        "width": 466,
+        "height": 262.125
+      },
+      "reference": {
+        "width": 466,
+        "height": 262.125
+      },
+      "scroll": 1024
+    },
+    {
+      "width": 768,
+      "current": {
+        "width": 338,
+        "height": 190.125
+      },
+      "reference": {
+        "width": 338,
+        "height": 190.125
+      },
+      "scroll": 768
+    },
+    {
+      "width": 390,
+      "current": {
+        "width": 358,
+        "height": 201.375
+      },
+      "reference": {
+        "width": 358,
+        "height": 201.375
+      },
+      "scroll": 390
+    }
+  ],
+  "formalRequests": 0,
+  "errors": []
+}

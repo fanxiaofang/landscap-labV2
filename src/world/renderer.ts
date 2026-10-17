@@ -15,19 +15,25 @@ export class LandscapeRenderer {
   readonly camera;
   readonly clouds=buildCloudSea();
   private wire=false;
-  constructor(canvas:HTMLCanvasElement,readonly frame:Frame=FRAME) {
+  constructor(canvas:HTMLCanvasElement,readonly frame:Frame=FRAME,readonly benchmark=true) {
     this.camera=createOverviewCamera(frame);
     this.renderer=new WebGLRenderer({canvas,alpha:true,antialias:true,preserveDrawingBuffer:true,powerPreference:'low-power'});
     this.renderer.setPixelRatio(1);this.renderer.setSize(frame.width,frame.height,false);
     this.renderer.outputColorSpace=SRGBColorSpace;this.renderer.setClearColor(0x000000,0);
-    this.scene.add(buildGround(),buildRidges(),buildFields(),buildMeadowZones(),this.clouds);this.render();
+    this.scene.add(buildGround(),buildRidges(),this.clouds);
+    if(!benchmark)this.scene.add(buildFields(),buildMeadowZones());
+    this.render();
   }
-  setClouds(enabled:boolean) {this.clouds.visible=enabled;this.render();}
+  setClouds(enabled:boolean) {
+    this.clouds.visible=enabled;
+    this.scene.traverse(o=>{if(o instanceof Mesh&&o.userData.clearColors)o.geometry.setAttribute('color',enabled?o.userData.cloudColors:o.userData.clearColors);});
+    this.render();
+  }
   setWireframe(enabled:boolean) {
     this.wire=enabled;
     this.scene.traverse(o=>{if(o instanceof Mesh)(o.material as MeshBasicMaterial).wireframe=enabled;});this.render();
   }
   render() {this.renderer.render(this.scene,this.camera);}
-  get stats() {return {drawCalls:this.renderer.info.render.calls,triangles:this.renderer.info.render.triangles,wireframe:this.wire,clouds:this.clouds.visible,frame:this.frame};}
+  get stats() {return {drawCalls:this.renderer.info.render.calls,triangles:this.renderer.info.render.triangles,wireframe:this.wire,clouds:this.clouds.visible,benchmark:this.benchmark,frame:this.frame};}
   dispose(){this.scene.traverse((o:Object3D)=>{if(o instanceof Mesh){o.geometry.dispose();(o.material as MeshBasicMaterial).dispose();}});this.renderer.dispose();}
 }
