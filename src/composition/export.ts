@@ -10,8 +10,8 @@ export async function exportFrame(engine:LandscapeRenderer,view:CompositionView,
     const ctx=out.getContext('2d');if(!ctx)throw new Error('无法创建截图画布');
     // The WebGL frame already includes the opaque autumn sky seen in preview.
     ctx.drawImage(engine.renderer.domElement,0,0);
-    if(view==='proxy')ctx.drawImage(await loadImage(proxyUrl(engine.frame)),0,0,width,height);
-    if(calibration){const text=new XMLSerializer().serializeToString(calibration);const url=URL.createObjectURL(new Blob([text],{type:'image/svg+xml'}));try{ctx.drawImage(await loadImage(url),0,0,width,height);}finally{URL.revokeObjectURL(url);}}
+    if(view==='proxy'&&engine.stats.cameraView==='target')ctx.drawImage(await loadImage(proxyUrl(engine.frame)),0,0,width,height);
+    if(calibration&&engine.stats.cameraView==='target'){const text=new XMLSerializer().serializeToString(calibration);const url=URL.createObjectURL(new Blob([text],{type:'image/svg+xml'}));try{ctx.drawImage(await loadImage(url),0,0,width,height);}finally{URL.revokeObjectURL(url);}}
     return out.toDataURL('image/png');
   }finally{engine.setClouds(previous);}
 }

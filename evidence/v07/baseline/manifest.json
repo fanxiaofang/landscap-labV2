@@ -1,0 +1,20 @@
+{
+  "version": "0.6",
+  "commit": "9c2a5c1",
+  "frame": {
+    "width": 1600,
+    "height": 900
+  },
+  "hashes": {
+    "v06-terrain.png": "841a79a87d5bdb887479bd3c14a0132b92a8e0b4584ed30d98040acfd139150e",
+    "v06-clouds.png": "f5343bdbe8e73c9b3eaf8b68e689c521319a07b0a8007dc3fd361926ab36923d",
+    "src/terrain/layout.ts": "8c0b4d3ee0cf9618e175ecd821c806173380cffc01adc974757963950c8d42eb",
+    "src/terrain/ridgeSurface.ts": "b5c65e8ebaf356b14008739c53e9171515f9a80132489d563beb5c9c789ca165",
+    "src/terrain/geometry.ts": "6b7d8c837ced4bc08a69b907719174e76c64389aef3cfeafc096d8110c7a219e",
+    "src/world/projection.ts": "d897ad8a80bde419ab0605c97fdfd2ecc09db210196dc9a2fa6d5a9b91e5bdf9",
+    "src/world/renderer.ts": "98cb90d83828a7fd0d7189c00d9cf1209a86d8e4473da5f3850ad429b1a5d2b2",
+    "src/world/environment.ts": "300afe32a03834f3d1b91bb87d76196512862ba62b6916fa0fb646c68d28d3f2",
+    "src/world/cloudField.ts": "bf3612bf49bd40d95c7150fac8a090abecf8228603dad86dcd2a10037e6e023f",
+    "src/world/cloudSea.ts": "fdd3999a695ddd1b935fee87cce650628ee3e6ec2a2ee6bf0421033c6306c6cf"
+  }
+}

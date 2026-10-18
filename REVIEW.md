@@ -1,3 +1,5 @@
+> 当前 V0.7 审阅见 [evidence/v07/REVIEW.md](evidence/v07/REVIEW.md)。以下为保留的 V0.5 历史记录。
+
 # V0.5 中景山群 benchmark
 
 状态：**候选图已生成；美术未验收；不进入整场景集成。**

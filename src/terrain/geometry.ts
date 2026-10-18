@@ -1,5 +1,5 @@
 import { BufferGeometry, Float32BufferAttribute, Vector3, Color, Mesh, MeshBasicMaterial, Group, CatmullRomCurve3 } from 'three';
-import { ridgeGeometry } from './ridgeSurface';
+import { ridgeGeometry, terrainGeometry } from './ridgeSurface';
 export { ridgeGeometry } from './ridgeSurface';
 import { cloudHeight, cloudColor } from '../world/cloudField';
 import { worldPoint } from '../world/projection';
@@ -32,29 +32,22 @@ const plan=(v:Vector3)=>({u:(v.x-v.z)*Math.SQRT1_2,d:-(v.x+v.z)*Math.SQRT1_2});
 const groundLight=new Vector3(.4,.8,-.3).normalize();
 function groundColor(u:number,d:number,n:Vector3) {
   const shoulder=shoulderDepth(u),c=new Color(PALETTE.meadow);
-  const foreground=smooth(-150,-900,d);
-  const sweep=Math.exp(-(((u+300+0.4*d)/850)**2))*foreground;
-  c.lerp(new Color(PALETTE.meadowShade),sweep*.65);
-  c.lerp(new Color(PALETTE.meadowLight),.45*Math.exp(-(((u-70)/400)**2)-((d+180)/500)**2));
-  // Material bands live in the ground's vertex colors, so overlapping meadow zones cannot z-fight.
-  const bands=[
-    {color:'#93a33a',d0:-320,d1:-580,width:230,bend:280,u0:-1250,u1:1300},
-    {color:'#7a9133',d0:-650,d1:-1100,width:370,bend:140,u0:-1300,u1:300},
-    {color:'#6f852e',d0:-1280,d1:-570,width:490,bend:-180,u0:-350,u1:1700},
-    {color:'#5f772f',d0:-1100,d1:-1510,width:540,bend:210,u0:-1400,u1:1200},
-  ];
-  for(const band of bands){
-    const s=(u-band.u0)/(band.u1-band.u0);
-    if(s<0||s>1)continue;
-    const edge=band.d0+(band.d1-band.d0)*s+band.bend*Math.sin(s*Math.PI);
-    const half=band.width*(.05+.95*Math.sin(s*Math.PI))/2;
-    c.lerp(new Color(band.color),1-smooth(half-18,half+18,Math.abs(d-edge)));
-  }
-  c.lerp(new Color(PALETTE.shoulder),smooth(shoulder-30,shoulder+600,d));
-  c.lerp(new Color('#596847'),.30*smooth(shoulder+100,shoulder+740,d)*(1-smooth(shoulder+740,shoulder+1450,d)));
-  c.lerp(new Color(PALETTE.valley),smooth(shoulder+600,shoulder+1450,d));
+  // Broad material variation follows landforms, without parallel contour bands.
+  const patch=(x:number,z:number,rx:number,rz:number)=>Math.exp(-(((u-x)/rx)**2)-((d-z)/rz)**2);
+  c.lerp(new Color(PALETTE.meadowLight),.52*patch(80,-260,520,600)+.23*patch(-680,50,440,730));
+  c.lerp(new Color(PALETTE.meadowShade),.38*patch(-270,-780,340,580)+.28*patch(760,-1020,550,540));
+  c.lerp(new Color('#8b963e'),.34*patch(-730,-650,470,510));
+  // Elevation loss and slope locate the transition. No dark stripe follows the
+  // entire rear edge; the upper shoulder remains grass and the apron dries out.
+  const descent=smooth(shoulder+180,shoulder+1850,d);
+  c.lerp(new Color('#929266'),descent*.75);
+  c.lerp(new Color(PALETTE.valley),smooth(shoulder+1000,shoulder+2420,d));
   c.lerp(new Color(PALETTE.farValley),smooth(2600,4300,d));
-  c.multiplyScalar(.82+.18*Math.max(0,n.dot(groundLight)));
+  const grass=1-smooth(shoulder+300,shoulder+1800,d);
+  c.lerp(new Color('#b0ae4d'),.3*patch(-690,-550,460,350)*grass);
+  c.lerp(new Color('#667c3c'),.52*patch(-350,220,240,790)*grass);
+  c.lerp(new Color('#76904a'),.36*patch(680,160,290,650)*grass);
+  c.multiplyScalar(.63+.37*Math.max(0,n.dot(groundLight)));
   return c;
 }
 
@@ -63,6 +56,29 @@ export function buildGround() {
   const g=indexedSurface(grid.cols,grid.rows,(s,t)=>{const u=grid.minU+s*grid.width,d=grid.minD+t*grid.depth;return worldPoint(u,d,groundHeight(u,d));});
   colorize(g,(p,n)=>{const {u,d}=plan(p);return groundColor(u,d,n);});
   return mesh('continuous-meadow-farm-valley',g);
+}
+
+export function buildTerrain() {
+  const g=terrainGeometry(),relief=g.getAttribute('relief'),air=g.getAttribute('atmosphere');
+  const light=new Vector3(.25,.8,-.6).normalize();
+  colorize(g,(p,n,i)=>{
+    const {u,d}=plan(p),base=groundColor(u,d,n);
+    if(relief.getX(i)<=0)return base;
+    const c=new Color(PALETTE.ridgeShadow).lerp(new Color(PALETTE.ridgeLight),Math.max(0,n.dot(light)));
+    c.lerp(new Color(PALETTE.ridgeRock),smooth(90,320,relief.getX(i))*.38);
+    c.lerp(new Color(PALETTE.atmosphere),air.getX(i));
+    return base.lerp(c,smooth(0,55,relief.getX(i)));
+  });
+  const clear=g.getAttribute('color'),mist=clear.clone(),position=g.getAttribute('position');
+  for(let i=0;i<position.count;i++){
+    const v=new Vector3().fromBufferAttribute(position,i),{u,d}=plan(v);
+    const contact=(1-smooth(0,35,v.y-cloudHeight(u,d)))*smooth(0,55,relief.getX(i));
+    const c=new Color().fromBufferAttribute(clear,i).lerp(cloudColor(u,d),contact*.62);
+    mist.setXYZ(i,c.r,c.g,c.b);
+  }
+  const m=mesh('continuous-terrain-foundation',g);
+  m.userData.clearColors=clear;m.userData.cloudColors=mist;
+  return m;
 }
 
 export function buildRidges() {
@@ -79,7 +95,7 @@ export function buildRidges() {
       c.lerp(new Color(PALETTE.atmosphere),def.atmosphere);
       // Match the valley at the toes instead of leaving an outlined, isolated mound.
       const base=groundColor(u,d,new Vector3(0,1,0));
-      c.lerp(base,1-smooth(0,38,p.y-valleyHeight(u,d)));
+      c.lerp(base,1-smooth(0,38,p.y-groundHeight(u,d)));
       return c;
     });
     const clear=g.getAttribute('color'),mist=clear.clone(),position=g.getAttribute('position');

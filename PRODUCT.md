@@ -10,7 +10,7 @@ Live With Me 的作者与美术验收者，在桌面工作环境中比较纯地�
 
 ## Product Purpose
 
-在现有 Landscape V2 仓库持续迭代 React / Three.js 环境。V0.5 中景山群 benchmark 以 references/01_autumn_approved.png.png（运行时 autumn-approved.png）为唯一主要美术构图基准，重构前景斜向草甸、谷地留白、分散露出的山群与高处俯瞰关系。以同尺度 16:9 纯地形、静态云海和 Proxy 对照审阅。
+在现有 Landscape V2 仓库持续迭代 React / Three.js 环境。V0.7 Terrain Foundation 以 references/01_autumn_approved.png.png（运行时 autumn-approved.png）为唯一主要美术构图基准，重构前景斜向草甸、谷地留白、分散露出的山群与高处俯瞰关系。使用 16:9 目标正交构图与自由视角结构共同验证，现有静态云海只作构图占位。
 
 ## Brand Personality
 
@@ -24,7 +24,7 @@ Live With Me 的作者与美术验收者，在桌面工作环境中比较纯地�
 
 - 在当前仓库保留有效实现，所有地形确定性可复现。
 - 默认显示秋季定稿图，使用相同 16:9 画框、归一化轮廓和叠图对照。V0.2/V0.3 仅作为历史记录。
-- 本轮只审阅纯地形、静态云海、与秋季定稿并排图。benchmark 隐藏田块、Proxy 和正式 SVG；形体未通过时不进入整场景集成。
+- 本轮审阅纯地形、自由视角结构、静态云海和 V0.6 / V0.7 / 秋季定稿对照图。benchmark 隐藏田块、Proxy 和正式 SVG；形体未通过时不进入整场景集成。
 - 先由地形确定空间，再让通用叙事区域和正式资产适配地形。
 - 主屋保持核心体量和稳定支撑区；外围草甸允许宽缓起伏与自然下坡。
 - 农田可以在两侧草甸中穿插，不要求每块田低于所有草甸，但不能形成独立高包；在最终正交画面检查视觉高低。

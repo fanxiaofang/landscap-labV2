@@ -12,56 +12,88 @@ export function valleyHeight(u:number,d:number) {
     +45*bump(u,d,-150,3400,650,650);
 }
 export function shoulderDepth(u:number) {
-  // Reference-led diagonal: the left farming shoulder recedes, the right bank comes forward.
-  return -65-.45*u+70*Math.sin((u+160)/210)+110*bump(u,0,-800,0,400,1)+70*bump(u,0,-420,0,420,1)-65*bump(u,0,580,0,290,1);
+  // Two unequal promontories and a recessed western valley mouth. This is a
+  // terrain boundary, not a straight screen-space band or an asset footprint.
+  return 35-.28*u+115*bump(u,0,-700,0,430,1)
+    -155*bump(u,0,-260,0,280,1)+85*bump(u,0,220,0,350,1)
+    -110*bump(u,0,660,0,350,1);
 }
-export function shoulderWidth(u:number) {return 1450+110*bump(u,0,-600,0,500,1);}
+export function shoulderWidth(u:number) {
+  return 2160+280*bump(u,0,-280,0,420,1)-180*bump(u,0,600,0,320,1);
+}
 export function groundHeight(u:number,d:number) {
-  const hollow=37*bump(u,d,-490,20,400,520)+20*bump(u,d,600,-350,340,400);
-  const rolling=33*bump(u,d,-470,-800,520,400)+25*bump(u,d,480,-1040,430,430)-20*bump(u,d,150,-650,300,320);
+  const rolling=85*bump(u,d,-630,-610,520,460)
+    +70*bump(u,d,530,-870,500,560)+24*bump(u,d,120,-1240,720,430)
+    -55*bump(u,d,-260,-610,270,490)-30*bump(u,d,650,-260,330,390);
   const radius=Math.hypot((u-LIVING_AREA.u)/LIVING_AREA.radiusU,(d-LIVING_AREA.d)/LIVING_AREA.radiusD);
-  const homePad=1-smooth(.7,1.65,radius);
-  const top=HOME_HEIGHT+(rolling-hollow)*(1-homePad);
-  const shoulder=shoulderDepth(u),fall=.22*smooth(shoulder,shoulder+800,d)+.78*smooth(shoulder+700,shoulder+shoulderWidth(u),d);
-  return top*(1-fall)+valleyHeight(u,d)*fall;
+  const homePad=1-smooth(.65,1.5,radius);
+  const valleyMouth=125*bump(u,d,-360,230,260,840)+55*bump(u,d,720,320,320,650);
+  const top=HOME_HEIGHT+(rolling-valleyMouth)*(1-homePad);
+  const shoulder=shoulderDepth(u),width=shoulderWidth(u);
+  // A broad upper shoulder flows into an unequal lower apron. The hollow
+  // between them opens a valley mouth; only the small living area stays level.
+  const fall=.44*smooth(shoulder-250,shoulder+width*.66,d)
+    +.56*smooth(shoulder+380,shoulder+width,d);
+  const apron=45*bump(u,d,-640,1200,380,700)
+    +32*bump(u,d,530,950,300,600)-38*bump(u,d,-200,1100,220,720);
+  return top*(1-fall)+valleyHeight(u,d)*fall+apron*fall*(1-fall)*4;
 }
 export interface RidgeControl {u:number;d:number;h:number;w:number}
 export interface RidgeDefinition {id:string;name:string;atmosphere:number;flanks?:[number,number];points:RidgeControl[];branches?:RidgeControl[][]}
 const p=(u:number,d:number,h:number,w:number):RidgeControl=>({u,d,h,w});
-// One shared vocabulary from all five references: unequal twin peaks, shoulders,
-// a genuinely lower saddle, branching toes and staggered basin-sized gaps.
+// V0.7: authored world-space crests, not uniformly scaled V0.5 silhouettes.
+// Long descending branches share their parent's shoulder and end at the basin.
 export const RIDGES:RidgeDefinition[]=[
-  {id:'west-drift',name:'远层：展开的双峰长肩',atmosphere:.52,flanks:[.9,1.2],points:[p(-900,3360,-570,150),p(-710,3320,-495,220),p(-550,3250,-415,280),p(-435,3180,-460,230),p(-320,3220,-435,240),p(-140,3100,-560,175)],branches:[[p(-550,3250,-415,160),p(-590,3070,-405,165),p(-760,2900,-490,200),p(-880,2720,-550,150)],[p(-320,3220,-435,140),p(-260,3060,-460,150),p(-100,2870,-530,180)]]},
-  {id:'middle-saddle',name:'中层：低峰与斜向长支脊',atmosphere:.34,flanks:[1.15,.8],points:[p(-430,2660,-530,140),p(-255,2630,-385,185),p(-125,2540,-275,190),p(-50,2500,-320,150),p(20,2450,-340,180),p(90,2320,-455,190)],branches:[[p(-125,2540,-275,90),p(-205,2400,-340,150),p(-375,2220,-420,220),p(-500,2110,-480,170)]]},
-  {id:'near-fold',name:'中央：主峰、鞍部、低次峰与三条支脊',atmosphere:.18,flanks:[.92,1.25],points:[p(-45,2440,-440,160),p(100,2330,-305,260),p(165,2310,-220,300),p(195,2290,-210,310),p(235,2280,-224,290),p(280,2230,-258,220),p(350,2160,-235,180),p(440,2080,-320,205),p(560,1970,-450,210)],branches:[[p(180,2290,-210,180),p(150,2150,-275,215),p(75,1990,-320,190),p(-55,1850,-420,245),p(-155,1750,-480,180)],[p(350,2160,-235,95),p(350,2010,-300,150),p(430,1840,-395,225),p(540,1730,-460,170)],[p(150,2150,-275,140),p(220,2010,-330,130),p(205,1830,-430,160)]]},
-  {id:'east-spur',name:'右近：宽主峰与错位次峰',atmosphere:.08,flanks:[1.3,.85],points:[p(400,1820,-380,150),p(505,1750,-180,200),p(545,1700,-74,310),p(575,1670,-55,325),p(610,1650,-78,300),p(665,1630,-185,230),p(755,1650,-150,280),p(850,1540,-270,220),p(1060,1420,-440,190)],branches:[[p(560,1670,-55,175),p(510,1550,-140,230),p(425,1400,-280,220),p(270,1250,-420,255)],[p(755,1650,-150,100),p(735,1480,-235,175),p(850,1280,-390,240),p(1040,1120,-470,180)],[p(510,1550,-140,90),p(585,1400,-275,130),p(625,1230,-420,180)]]},
-  {id:'quiet-islet',name:'极远：低矮小山群',atmosphere:.69,flanks:[.8,1.2],points:[p(-90,3780,-720,100),p(20,3730,-595,130),p(100,3680,-560,120),p(155,3660,-605,110),p(215,3670,-580,115),p(330,3550,-700,120)]},
-  {id:'east-low',name:'右后：错位退远山肩',atmosphere:.52,flanks:[.85,1.2],points:[p(390,3180,-610,100),p(500,3120,-485,140),p(595,3080,-420,155),p(680,3000,-465,130),p(780,2960,-435,140),p(950,2830,-580,150)],branches:[[p(595,3080,-420,75),p(530,2900,-485,130),p(380,2750,-560,160)]]},
-  {id:'horizon-west',name:'极远西岭',atmosphere:.76,points:[p(-1300,4700,-900,180),p(-940,4760,-820,210),p(-780,4730,-785,175),p(-590,4800,-830,180),p(-390,4780,-790,160),p(-170,4820,-880,150)]},
-  {id:'horizon-east',name:'极远东岭',atmosphere:.84,points:[p(-200,4880,-920,170),p(80,4820,-860,190),p(300,4860,-885,200),p(530,4800,-845,180),p(730,4900,-880,160),p(1100,4900,-930,170)]},
+  {id:'west-drift',name:'西远群：错峰与展开长肩',atmosphere:.52,flanks:[.9,1.22],points:[
+    p(-1220,3460,-650,190),p(-940,3520,-570,260),p(-690,3500,-535,260),
+    p(-580,3450,-530,240),p(-455,3350,-550,240),p(-230,3200,-610,240),
+  ],branches:[
+    [p(-690,3500,-535,200),p(-770,3280,-530,230),p(-970,3000,-540,280),p(-1170,2730,-470,220)],
+    [p(-455,3350,-550,150),p(-410,3160,-535,210),p(-520,2930,-525,250)],
+  ]},
+  {id:'middle-saddle',name:'中西群：低主峰、偏置鞍部与长支脊',atmosphere:.37,flanks:[1.15,.9],points:[
+    p(-610,3180,-570,150),p(-400,3220,-510,205),p(-245,3160,-470,225),
+    p(-160,3070,-475,200),p(-65,3000,-475,185),p(70,2880,-550,200),
+  ],branches:[
+    [p(-245,3160,-470,150),p(-330,2920,-445,200),p(-480,2730,-455,250),p(-730,2440,-460,260)],
+  ]},
+  {id:'near-fold',name:'中央群：主峰、低鞍、次峰与扇形山脚',atmosphere:.21,flanks:[.96,1.2],points:[
+    p(-250,2860,-520,170),p(-60,2900,-405,250),p(110,2810,-350,270),
+    p(155,2760,-338,280),p(205,2700,-355,260),p(300,2570,-410,240),
+    p(385,2540,-365,250),p(490,2410,-425,240),p(710,2250,-500,210),
+  ],branches:[
+    [p(155,2760,-338,180),p(70,2580,-330,240),p(-80,2360,-380,280),p(-330,2130,-440,310)],
+    [p(385,2540,-365,145),p(310,2350,-395,210),p(410,2120,-435,260),p(650,1880,-460,270)],
+    [p(70,2580,-330,140),p(70,2380,-385,195),p(-35,2190,-435,230)],
+  ]},
+  {id:'east-spur',name:'右近群：高主峰、宽肩与低次峰',atmosphere:.12,flanks:[1.22,.88],points:[
+    p(310,2440,-480,180),p(485,2390,-340,250),p(640,2260,-205,285),
+    p(675,2210,-180,300),p(715,2140,-210,300),p(820,2070,-320,265),
+    p(955,2140,-275,280),p(1130,2080,-360,280),p(1370,1840,-455,240),
+  ],branches:[
+    [p(675,2210,-180,190),p(590,2020,-255,245),p(460,1820,-335,280),p(300,1580,-400,300)],
+    [p(955,2140,-275,155),p(930,1910,-325,210),p(1100,1630,-400,300),p(1390,1410,-440,250)],
+    [p(590,2020,-255,135),p(680,1830,-340,200),p(700,1620,-415,260)],
+  ]},
+  {id:'quiet-islet',name:'远中群：低脊与开阔谷地',atmosphere:.7,flanks:[.85,1.25],points:[
+    p(-100,4070,-800,130),p(60,4030,-710,160),p(170,4000,-680,170),
+    p(250,3910,-730,150),p(355,3880,-700,165),p(540,3740,-760,170),
+  ]},
+  {id:'east-low',name:'右远群：宽缓后肩',atmosphere:.6,flanks:[.95,1.15],points:[
+    p(450,3620,-690,150),p(660,3670,-625,230),p(825,3610,-565,240),
+    p(980,3500,-615,220),p(1110,3490,-585,230),p(1390,3270,-650,230),
+  ],branches:[
+    [p(825,3610,-565,160),p(740,3380,-580,210),p(550,3170,-580,250)],
+  ]},
+  {id:'horizon-west',name:'极远西岭：低脊、缓肩与东向缺口',atmosphere:.82,flanks:[1,1.1],points:[
+    p(-1540,4350,-940,220),p(-1220,4480,-870,250),p(-960,4550,-840,230),
+    p(-730,4450,-890,240),p(-520,4390,-855,220),p(-310,4250,-900,180),
+  ]},
+  {id:'horizon-east',name:'极远东岭：后移的低峰组',atmosphere:.88,flanks:[1.1,.95],points:[
+    p(310,4750,-1090,180),p(560,4850,-1040,230),p(800,4820,-990,240),
+    p(1030,4700,-1040,220),p(1260,4630,-1000,240),p(1550,4500,-1080,190),
+  ]},
 ];
-// World-space composition only. The orthographic camera does not shrink distant
-// objects, so author each group's scale and elevation independently of projection.
-// Keep the existing branching landform; allow its silhouette to move in the frame.
-export const RIDGE_PLACEMENTS:Record<string,{u:number;d:number;h:number;scale:number}>={
-  'west-drift':{u:-560,d:3500,h:-485,scale:.50},
-  'middle-saddle':{u:-170,d:3020,h:-385,scale:.50},
-  'near-fold':{u:120,d:2800,h:-350,scale:.61},
-  'east-spur':{u:565,d:2520,h:-280,scale:.57},
-  'quiet-islet':{u:60,d:3920,h:-600,scale:.45},
-  'east-low':{u:470,d:3490,h:-495,scale:.46},
-};
-for(const ridge of RIDGES){
-  const placement=RIDGE_PLACEMENTS[ridge.id];
-  if(!placement)continue;
-  const anchor={...ridge.points.reduce((a,b)=>a.h>b.h?a:b)};
-  for(const point of [ridge.points,...(ridge.branches??[])].flat()){
-    point.u=placement.u+(point.u-anchor.u)*placement.scale;
-    point.d=placement.d+(point.d-anchor.d)*placement.scale;
-    point.h=placement.h+(point.h-anchor.h)*placement.scale;
-    point.w*=placement.scale;
-  }
-}
 export interface FieldDefinition {id:string; corners:[number,number][]; color:number; nearBend:number; farBend:number; sideBend:number}
 export const FIELDS:FieldDefinition[]=[
   {id:'tractor-plot',color:0,corners:[[-1080,185],[-190,-70],[-190,155],[-1080,585]],nearBend:-20,farBend:25,sideBend:15},
@@ -75,7 +107,7 @@ export function fieldPoint(field:FieldDefinition,s:number,t:number) {
   return {u,d,h:groundHeight(u,d)};
 }
 export const WALK_ROUTE=[{u:LIVING_AREA.u,d:LIVING_AREA.d},{u:-140,d:-160},{u:-300,d:-90},{u:-440,d:10},{u:-530,d:100}];
-export const GROUND_GRID={minU:-2600,width:5200,minD:-1900,depth:7700,cols:200,rows:300};
+export const GROUND_GRID={minU:-4200,width:8400,minD:-2600,depth:9500,cols:320,rows:370};
 export function renderedGroundHeight(u:number,d:number) {
   const g=GROUND_GRID,x=(u-g.minU)/g.width*g.cols,z=(d-g.minD)/g.depth*g.rows;
   const ix=Math.max(0,Math.min(g.cols-1,Math.floor(x))),iz=Math.max(0,Math.min(g.rows-1,Math.floor(z)));

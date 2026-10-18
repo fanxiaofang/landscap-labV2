@@ -1,9 +1,16 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
-import { RIDGES, RIDGE_PLACEMENTS, valleyHeight } from '../src/terrain/layout';
+import * as layout from '../src/terrain/layout';
 import { ridgeGeometry } from '../src/terrain/ridgeSurface';
 import { cloudHeight, CLOUD_REGIONS, CLOUD_BILLOWS } from '../src/world/cloudField';
 import { projectPoint } from '../src/world/projection';
+
+// Historical assertion: V0.7 intentionally removes uniform group scaling.
+// Fail clearly if run against a later authoring model; do not recreate that
+// obsolete constraint in the current terrain just to satisfy this script.
+if(!('RIDGE_PLACEMENTS' in layout))throw new Error('Historical V0.6 check: run at afcb308. Use npm run check:geometry for the current terrain.');
+const {RIDGES,valleyHeight}=layout;
+const RIDGE_PLACEMENTS=layout.RIDGE_PLACEMENTS as Record<string,{scale:number}>;
 
 const before=JSON.parse(await fs.readFile('evidence/v05/geometry-report.json','utf8'));
 const groups=[];
