@@ -1,4 +1,5 @@
 import { sceneLayout, SCENE_PLACEMENTS, type SceneSlot } from './placements';
+import { FRAME, frameMapping, type Frame } from '../world/projection';
 
 export interface AssetPlacement {
   slot: SceneSlot;
@@ -36,14 +37,19 @@ export function assetLayout() {
   });
 }
 
-let composition: Promise<{url:string;svg:string}> | undefined;
-export function loadAssetComposition() {
-  return composition??=(async()=>{
+const compositions=new Map<string,Promise<{url:string;svg:string}>>();
+export function loadAssetComposition(frame:Frame=FRAME) {
+  const key=`${frame.width}x${frame.height}`,cached=compositions.get(key);if(cached)return cached;
+  const pending=(async()=>{
     const response=await fetch('/reference/live-assets.svg');
     if(!response.ok)throw new Error('无法载入 Live With Me 原始资产');
     const doc=new DOMParser().parseFromString(await response.text(),'image/svg+xml');
     if(doc.querySelector('parsererror'))throw new Error('原始 SVG 无法解析');
     const root=doc.documentElement;
+    root.setAttribute('viewBox',`0 0 ${frame.width} ${frame.height}`);root.setAttribute('width',String(frame.width));root.setAttribute('height',String(frame.height));
+    root.setAttribute('preserveAspectRatio','xMidYMid meet');
+    const layer=doc.createElementNS(root.namespaceURI,'g'),mapping=frameMapping(frame);
+    layer.setAttribute('transform',`translate(0 ${mapping.offsetY}) scale(${mapping.scale})`);
     for(const asset of assetLayout()){
       const original=root.querySelector(`[data-source-id="${asset.id}"]`);
       if(!original)throw new Error(`缺少核心资产：${asset.name}`);
@@ -51,11 +57,13 @@ export function loadAssetComposition() {
       wrapper.setAttribute('data-placement-id',asset.id);
       wrapper.setAttribute('transform',`translate(${asset.dx} ${asset.dy}) scale(${asset.scale})`);
       // Reappend in the explicit back-to-front composition order, preserving the original wrapper.
-      wrapper.append(original);root.append(wrapper);
+      wrapper.append(original);layer.append(wrapper);
     }
+    root.append(layer);
     const svg=new XMLSerializer().serializeToString(root);
     return {svg,url:URL.createObjectURL(new Blob([svg],{type:'image/svg+xml'}))};
-  })().catch(error=>{composition=undefined;throw error;});
+  })().catch(error=>{compositions.delete(key);throw error;});
+  compositions.set(key,pending);return pending;
 }
 
-if(import.meta.hot)import.meta.hot.dispose(()=>{composition?.then(({url})=>URL.revokeObjectURL(url)).catch(()=>{});});
+if(import.meta.hot)import.meta.hot.dispose(()=>{compositions.forEach(p=>p.then(({url})=>URL.revokeObjectURL(url)).catch(()=>{}));});

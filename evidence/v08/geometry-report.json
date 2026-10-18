@@ -1,0 +1,137 @@
+{
+  "version": "0.8",
+  "passed": true,
+  "artApproval": "PENDING_AUTHOR_REVIEW",
+  "mesh": {
+    "vertices": 207311,
+    "triangles": 412800,
+    "components": 1,
+    "internalHoles": 0,
+    "boundaryEdges": 1820,
+    "invalid": 0,
+    "downward": 0,
+    "degenerate": 0,
+    "maxNormalError": 4.043560331012941e-8
+  },
+  "support": [
+    {
+      "slot": "observatory",
+      "variation": 1.0997535785695334,
+      "center": 199.88182030923676
+    },
+    {
+      "slot": "home",
+      "variation": 0.00000215061044173126,
+      "center": 200.00000000431504
+    },
+    {
+      "slot": "tractor",
+      "variation": 0.6173112060419896,
+      "center": 196.59022556424904
+    },
+    {
+      "slot": "cabin",
+      "variation": 1.2775558388966601e-9,
+      "center": 200.0000000001459
+    },
+    {
+      "slot": "pod",
+      "variation": 0.000460310179590806,
+      "center": 200.00000000006247
+    },
+    {
+      "slot": "grounds",
+      "variation": 1.528906687732217,
+      "center": 199.18225434950506
+    },
+    {
+      "slot": "pumpkins",
+      "variation": 3.8847000811841212,
+      "center": 187.41178337162611
+    },
+    {
+      "slot": "flock",
+      "variation": 0.9499485252977706,
+      "center": 199.79441888706265
+    },
+    {
+      "slot": "pen",
+      "variation": 4.946577725618653,
+      "center": 206.52916145574795
+    }
+  ],
+  "fields": [
+    {
+      "id": "main-plot",
+      "near": -230,
+      "far": 502.8238082107675,
+      "area": 380672.3595491453,
+      "minHeight": 184.16214935019084,
+      "maxHeight": 199.68403100856662,
+      "maxProjectionBacktrack": 0
+    },
+    {
+      "id": "lower-plot",
+      "near": 440,
+      "far": 663.4338085214449,
+      "area": 50438.066919463665,
+      "minHeight": 171.859473054605,
+      "maxHeight": 189.03853875510453,
+      "maxProjectionBacktrack": 0
+    },
+    {
+      "id": "river-plot",
+      "near": 495,
+      "far": 634.1041498241518,
+      "area": 18250.90885279766,
+      "minHeight": 171.5377324665097,
+      "maxHeight": 184.73256335710235,
+      "maxProjectionBacktrack": 0
+    }
+  ],
+  "extension": 0.21916591479583095,
+  "river": {
+    "riverCenterOcclusions": 0,
+    "maxBankSlope": 0.7811152850518589,
+    "maxSlopeJump": 0.003986095746206786
+  },
+  "maxCrestHeight": 115.58120034753577,
+  "maxProjectionError": 1.7053025658242404e-13,
+  "projection": [
+    {
+      "azimuthDegrees": 45,
+      "elevationDegrees": 16.44460704375564,
+      "slopes": [
+        0.2830882352941171,
+        -0.2830882352941171
+      ],
+      "anglesDegrees": [
+        15.806193600678437,
+        -15.806193600678437
+      ],
+      "maxSlopeError": 5.551115123125783e-16
+    },
+    {
+      "azimuthDegrees": 45,
+      "elevationDegrees": 16.44460704375564,
+      "slopes": [
+        0.2830882352941178,
+        -0.28308823529411675
+      ],
+      "anglesDegrees": [
+        15.806193600678476,
+        -15.80619360067842
+      ],
+      "maxSlopeError": 8.881784197001252e-16
+    }
+  ],
+  "hashes": {
+    "src/world/projection.ts": "d897ad8a80bde419ab0605c97fdfd2ecc09db210196dc9a2fa6d5a9b91e5bdf9",
+    "public/reference/live-assets.svg": "58a0f53cf56aca78cd3f3bd901df7c85aacff3d63bc456797cfc5e6b18104d87"
+  },
+  "limitations": [
+    "Finite terrain heightfield has an open outer boundary.",
+    "Formal SVG is a target-camera composition check, not orbitable 3D architecture.",
+    "Static local haze is a vertex-colour aerial wash, not volumetric fog."
+  ]
+}

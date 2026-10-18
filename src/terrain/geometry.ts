@@ -1,147 +1,114 @@
 import { BufferGeometry, Float32BufferAttribute, Vector3, Color, Mesh, MeshBasicMaterial, Group, CatmullRomCurve3 } from 'three';
-import { ridgeGeometry, terrainGeometry } from './ridgeSurface';
+import { terrainGeometry } from './ridgeSurface';
 export { ridgeGeometry } from './ridgeSurface';
-import { cloudHeight, cloudColor } from '../world/cloudField';
 import { worldPoint } from '../world/projection';
-import { PALETTE } from '../world/environment';
-import { groundHeight, valleyHeight, shoulderDepth, smooth, FIELDS, fieldPoint, RIDGES, GROUND_GRID, WALK_ROUTE, renderedGroundHeight } from './layout';
+import { groundHeight, smooth, bump, FIELDS, fieldPoint, WALK_ROUTE, renderedGroundHeight, riverCenter, riverWidth, riverHeight, riverDistance, RIVER_RANGE } from './layout';
 
 export function indexedSurface(cols:number,rows:number,sample:(s:number,t:number)=>Vector3) {
   const positions:number[]=[],indices:number[]=[];
   for(let j=0;j<=rows;j++)for(let i=0;i<=cols;i++)positions.push(...sample(i/cols,j/rows).toArray());
-  for(let j=0;j<rows;j++)for(let i=0;i<cols;i++){
-    const a=j*(cols+1)+i,b=a+1,c=a+cols+1,d=c+1;
-    indices.push(a,c,b,b,c,d);
-  }
-  const geometry=new BufferGeometry();
-  geometry.setAttribute('position',new Float32BufferAttribute(positions,3));
-  geometry.setIndex(indices);geometry.computeVertexNormals();
-  // u,d mapping has orientation -Y with the default winding; ensure all surface normals face up.
-  const n=geometry.getAttribute('normal');
-  let sum=0;for(let i=0;i<n.count;i++)sum+=n.getY(i);
-  if(sum<0){for(let i=0;i<indices.length;i+=3)[indices[i+1],indices[i+2]]=[indices[i+2],indices[i+1]];geometry.setIndex(indices);geometry.computeVertexNormals();}
-  return geometry;
+  for(let j=0;j<rows;j++)for(let i=0;i<cols;i++){const a=j*(cols+1)+i,b=a+1,c=a+cols+1,d=c+1;indices.push(a,b,c,b,d,c);}
+  const g=new BufferGeometry();g.setAttribute('position',new Float32BufferAttribute(positions,3));g.setIndex(indices);g.computeVertexNormals();return g;
 }
 function colorize(g:BufferGeometry,color:(p:Vector3,n:Vector3,index:number)=>Color) {
-  const pos=g.getAttribute('position'), normals=g.getAttribute('normal'), colors:number[]=[];
+  const pos=g.getAttribute('position'),normals=g.getAttribute('normal'),colors:number[]=[];
   for(let i=0;i<pos.count;i++)colors.push(...color(new Vector3().fromBufferAttribute(pos,i),new Vector3().fromBufferAttribute(normals,i),i).toArray());
   g.setAttribute('color',new Float32BufferAttribute(colors,3));return g;
 }
-function mesh(name:string,g:BufferGeometry) {const overlay=name.includes('plot')||name.includes('pasture')||name.includes('shoulder')||name.includes('bank')||name.includes('foreground')||name.includes('track');const m=new Mesh(g,new MeshBasicMaterial({vertexColors:true,polygonOffset:overlay,polygonOffsetFactor:overlay?-2:0,polygonOffsetUnits:overlay?-2:0}));m.name=name;return m;}
+function mesh(name:string,g:BufferGeometry,overlay=false) {
+  const m=new Mesh(g,new MeshBasicMaterial({vertexColors:true,polygonOffset:overlay,polygonOffsetFactor:overlay?-2:0,polygonOffsetUnits:overlay?-2:0}));m.name=name;return m;
+}
 const plan=(v:Vector3)=>({u:(v.x-v.z)*Math.SQRT1_2,d:-(v.x+v.z)*Math.SQRT1_2});
-const groundLight=new Vector3(.4,.8,-.3).normalize();
-function groundColor(u:number,d:number,n:Vector3) {
-  const shoulder=shoulderDepth(u),c=new Color(PALETTE.meadow);
-  // Broad material variation follows landforms, without parallel contour bands.
-  const patch=(x:number,z:number,rx:number,rz:number)=>Math.exp(-(((u-x)/rx)**2)-((d-z)/rz)**2);
-  c.lerp(new Color(PALETTE.meadowLight),.52*patch(80,-260,520,600)+.23*patch(-680,50,440,730));
-  c.lerp(new Color(PALETTE.meadowShade),.38*patch(-270,-780,340,580)+.28*patch(760,-1020,550,540));
-  c.lerp(new Color('#8b963e'),.34*patch(-730,-650,470,510));
-  // Elevation loss and slope locate the transition. No dark stripe follows the
-  // entire rear edge; the upper shoulder remains grass and the apron dries out.
-  const descent=smooth(shoulder+180,shoulder+1850,d);
-  c.lerp(new Color('#929266'),descent*.75);
-  c.lerp(new Color(PALETTE.valley),smooth(shoulder+1000,shoulder+2420,d));
-  c.lerp(new Color(PALETTE.farValley),smooth(2600,4300,d));
-  const grass=1-smooth(shoulder+300,shoulder+1800,d);
-  c.lerp(new Color('#b0ae4d'),.3*patch(-690,-550,460,350)*grass);
-  c.lerp(new Color('#667c3c'),.52*patch(-350,220,240,790)*grass);
-  c.lerp(new Color('#76904a'),.36*patch(680,160,290,650)*grass);
-  c.multiplyScalar(.63+.37*Math.max(0,n.dot(groundLight)));
+const light=new Vector3(-.45,.86,-.24).normalize();
+const mistColor=new Color('#eee1d4');
+function thinMist(u:number,d:number,h:number) {
+  const low=1-smooth(24,82,h-riverHeight(d));
+  return .16*low*(.8*bump(u,d,-560,1240,550,145)+.7*bump(u,d,620,1470,560,170)+.45*bump(u,d,-200,1790,650,90));
+}
+function withMist(m:Mesh) {
+  const g=m.geometry,clear=g.getAttribute('color'),mist=clear.clone(),position=g.getAttribute('position');
+  for(let i=0;i<position.count;i++){const p=new Vector3().fromBufferAttribute(position,i),{u,d}=plan(p),c=new Color().fromBufferAttribute(clear,i).lerp(mistColor,thinMist(u,d,p.y));mist.setXYZ(i,c.r,c.g,c.b);}
+  m.userData.clearColors=clear;m.userData.cloudColors=mist;return m;
+}
+function groundColor(u:number,d:number,n:Vector3,h:number) {
+  const daylight=Math.max(0,n.dot(light));
+  const c=new Color('#718d43').lerp(new Color('#b8bd58'),daylight*.73);
+  const wash=.5+.5*Math.sin(u/240+d/180)*Math.cos(d/210-u/630);
+  c.lerp(new Color('#a5b550'),.17*wash);
+  c.lerp(new Color('#79974c'),.34*bump(u,d,-600,-700,520,480)+.22*bump(u,d,620,-800,480,600));
+  c.lerp(new Color('#bdc162'),.3*bump(u,d,100,-250,480,420));
+  c.lerp(new Color('#c0b16d'),.17*bump(u,d,-700,470,530,390));
+  const slope=1-n.y;
+  c.lerp(new Color('#627d51'),smooth(.015,.24,slope)*.22);
+  const distance=riverDistance(u,d),width=riverWidth(d);
+  const bank=(1-smooth(width+3,width+18,distance))*smooth(210,400,d)*(1-smooth(1820,1930,d));
+  c.lerp(new Color('#b6bb80'),bank*.56);
+  const riverbed=1-smooth(width*.7,width+2,distance);
+  c.lerp(new Color('#728d7b'),riverbed*smooth(210,400,d)*(1-smooth(1820,1930,d))*.48);
+  // Atmospheric colour follows physical depth, leaving the low skyline quiet.
+  const air=smooth(1030,2100,d);
+  const distant=new Color('#718d87').lerp(new Color('#a2a1b9'),smooth(1430,2100,d));
+  distant.multiplyScalar(.78+.22*daylight);
+  c.lerp(distant,air*.9);
+  c.lerp(new Color('#adb3bc'),smooth(1700,2180,d)*.24);
+  c.lerp(new Color('#c4bf8b'),.08*bump(u,d,riverCenter(d),1000,230,700)*(1-smooth(25,75,h-riverHeight(d))));
   return c;
 }
-
-export function buildGround() {
-  const grid=GROUND_GRID;
-  const g=indexedSurface(grid.cols,grid.rows,(s,t)=>{const u=grid.minU+s*grid.width,d=grid.minD+t*grid.depth;return worldPoint(u,d,groundHeight(u,d));});
-  colorize(g,(p,n)=>{const {u,d}=plan(p);return groundColor(u,d,n);});
-  return mesh('continuous-meadow-farm-valley',g);
-}
-
 export function buildTerrain() {
   const g=terrainGeometry(),relief=g.getAttribute('relief'),air=g.getAttribute('atmosphere');
-  const light=new Vector3(.25,.8,-.6).normalize();
   colorize(g,(p,n,i)=>{
-    const {u,d}=plan(p),base=groundColor(u,d,n);
-    if(relief.getX(i)<=0)return base;
-    const c=new Color(PALETTE.ridgeShadow).lerp(new Color(PALETTE.ridgeLight),Math.max(0,n.dot(light)));
-    c.lerp(new Color(PALETTE.ridgeRock),smooth(90,320,relief.getX(i))*.38);
-    c.lerp(new Color(PALETTE.atmosphere),air.getX(i));
-    return base.lerp(c,smooth(0,55,relief.getX(i)));
+    const {u,d}=plan(p),base=groundColor(u,d,n,p.y),facing=Math.max(0,n.dot(light));
+    const hill=new Color('#63834d').lerp(new Color('#b6bd6b'),smooth(.72,.97,facing));
+    hill.lerp(new Color('#718d87'),smooth(.12,.46,air.getX(i))*.7);
+    hill.lerp(new Color('#929db3'),smooth(.4,.85,air.getX(i))*.83);
+    return base.lerp(hill,smooth(4,28,relief.getX(i))*.94);
   });
-  const clear=g.getAttribute('color'),mist=clear.clone(),position=g.getAttribute('position');
-  for(let i=0;i<position.count;i++){
-    const v=new Vector3().fromBufferAttribute(position,i),{u,d}=plan(v);
-    const contact=(1-smooth(0,35,v.y-cloudHeight(u,d)))*smooth(0,55,relief.getX(i));
-    const c=new Color().fromBufferAttribute(clear,i).lerp(cloudColor(u,d),contact*.62);
-    mist.setXYZ(i,c.r,c.g,c.b);
-  }
-  const m=mesh('continuous-terrain-foundation',g);
-  m.userData.clearColors=clear;m.userData.cloudColors=mist;
-  return m;
+  return withMist(mesh('continuous-hills-riverbed-meadow',g));
 }
-
-export function buildRidges() {
-  const group=new Group();group.name='authored-ridge-masses';
-  const light=new Vector3(.25,.8,-.6).normalize();
-  for(const def of RIDGES){
-    const g=ridgeGeometry(def);
-    colorize(g,(p,n)=>{
-      const {u,d}=plan(p);
-      const facing=Math.max(0,n.dot(light));
-      const c=new Color(PALETTE.ridgeShadow).lerp(new Color(PALETTE.ridgeLight),facing);
-      const high=smooth(valleyHeight(0,d)+90,valleyHeight(0,d)+320,p.y);
-      c.lerp(new Color(PALETTE.ridgeRock),high*.38);
-      c.lerp(new Color(PALETTE.atmosphere),def.atmosphere);
-      // Match the valley at the toes instead of leaving an outlined, isolated mound.
-      const base=groundColor(u,d,new Vector3(0,1,0));
-      c.lerp(base,1-smooth(0,38,p.y-groundHeight(u,d)));
-      return c;
-    });
-    const clear=g.getAttribute('color'),mist=clear.clone(),position=g.getAttribute('position');
-    for(let i=0;i<position.count;i++){
-      const v=new Vector3().fromBufferAttribute(position,i),{u,d}=plan(v);
-      const contact=1-smooth(0,35,v.y-cloudHeight(u,d));
-      const c=new Color().fromBufferAttribute(clear,i).lerp(cloudColor(u,d),contact*.62);
-      mist.setXYZ(i,c.r,c.g,c.b);
-    }
-    const m=mesh(def.id,g);m.userData.clearColors=clear;m.userData.cloudColors=mist;
-    group.add(m);
-  }
-  return group;
+export const buildGround=buildTerrain;
+export function buildRiver() {
+  const g=indexedSurface(12,850,(s,t)=>{
+    const d=RIVER_RANGE.near+t*(RIVER_RANGE.far-RIVER_RANGE.near);
+    return worldPoint(riverCenter(d)+(s-.5)*2*(riverWidth(d)+28),d,riverHeight(d));
+  });
+  colorize(g,(p,_n,i)=>{
+    const {d}=plan(p),s=(i%13)/12;
+    const c=new Color('#70a9a5').lerp(new Color('#d0d0b0'),.26+.22*Math.sin(d/190));
+    c.lerp(new Color('#a8c6be'),Math.pow(Math.abs(s-.5)*2,3)*.55);
+    c.lerp(new Color('#d7d6bb'),Math.pow(.5+.5*Math.sin(d*.22+s*15),18)*.12);
+    return c.lerp(new Color('#adb7b7'),smooth(1350,1930,d)*.5);
+  });
+  return withMist(mesh('continuous-winding-river',g));
 }
 export function buildFields() {
-  const group=new Group();group.name='conforming-farm-parcels';
+  const group=new Group();group.name='slope-following-field-parcels';
   for(const field of FIELDS){
-    const g=indexedSurface(48,36,(s,t)=>{const p=fieldPoint(field,s,t);return worldPoint(p.u,p.d,renderedGroundHeight(p.u,p.d)+.8);});
-    colorize(g,(_p,n,i)=>{
-      const s=(i%49)/48,t=Math.floor(i/49)/36;
-      const edge=Math.min(s,1-s,t,1-t);
-      const c=new Color(PALETTE.field[field.color]);
-      c.lerp(new Color(PALETTE.meadow),.16*(1-smooth(0,.09,edge)));
-      return c.multiplyScalar(.85+.15*Math.max(0,n.dot(groundLight)));
+    const cols=88,rows=72;
+    const g=indexedSurface(cols,rows,(s,t)=>{const p=fieldPoint(field,s,t);return worldPoint(p.u,p.d,renderedGroundHeight(p.u,p.d)+.36);});
+    colorize(g,(p,n,i)=>{
+      const s=(i%(cols+1))/cols,t=Math.floor(i/(cols+1))/rows,edge=Math.min(s,1-s,t,1-t),{u,d}=plan(p);
+      const variation=.5+.5*Math.sin(s*19+t*7)*Math.cos(t*12-s*3);
+      const c=new Color(['#c4ae59','#c0b56e','#b8b67b'][field.color]);
+      c.lerp(new Color('#e0c476'),variation*.32).multiplyScalar(.87+.13*Math.max(0,n.dot(light)));
+      c.lerp(groundColor(u,d,n,p.y),(1-smooth(0,.075,edge))*.83);
+      return c;
     });
-    group.add(mesh(field.id,g));
-    // Sparse cultivation furrows follow the exact surface sampler; they never float as a flat card.
-    for(let k=1;k<8;k++){
-      const line=indexedSurface(48,1,(s,t)=>{const p=fieldPoint(field,s,(k+t*.08)/8);return worldPoint(p.u,p.d,renderedGroundHeight(p.u,p.d)+.86);});
-      const color=new Color(PALETTE.field[field.color]).multiplyScalar(.94);
-      colorize(line,()=>color);group.add(mesh(`${field.id}-furrow-${k}`,line));
+    group.add(withMist(mesh(field.id,g,true)));
+    for(let k=1;k<field.rows;k++){
+      const line=indexedSurface(90,1,(s,t)=>{const p=fieldPoint(field,.035+s*.93,(k+t*.13)/field.rows);return worldPoint(p.u,p.d,renderedGroundHeight(p.u,p.d)+.5);});
+      colorize(line,(_p,_n,i)=>new Color('#ac984f').lerp(new Color('#d5bf76'),.3+.3*Math.sin(i*.13)));
+      group.add(withMist(mesh(`${field.id}-crop-${k}`,line,true)));
+    }
+    // Two curved grass divisions in the main field form readable plots, not bands.
+    if(field.color===0)for(const k of [.34,.69]){
+      const divider=indexedSurface(1,72,(s,t)=>{const p=fieldPoint(field,k+(s-.5)*.012+.018*Math.sin(t*4),t);return worldPoint(p.u,p.d,renderedGroundHeight(p.u,p.d)+.65);});
+      colorize(divider,()=>new Color('#929e58'));group.add(mesh('main-plot-grass-division',divider,true));
     }
   }
   return group;
 }
-
-// Large, quiet material zones on the same rolling ground, with no added prop detail.
 export function buildMeadowZones() {
-  const group=new Group();group.name='meadow-material-zones';
-  // One narrow access track makes the descent from the living pad to the fields readable.
-  const route=new CatmullRomCurve3(WALK_ROUTE.map(p=>new Vector3(p.u,0,p.d)),false,'catmullrom',.3);
-  const track=indexedSurface(100,2,(s,t)=>{
-    const p=route.getPoint(s),v=route.getTangent(s),width=9;
-    const u=p.x-v.z*(t-.5)*width,d=p.z+v.x*(t-.5)*width;
-    return worldPoint(u,d,renderedGroundHeight(u,d)+2);
-  });
-  colorize(track,()=>new Color('#b0ad70'));group.add(mesh('farm-access-track',track));
-  return group;
+  const group=new Group(),route=new CatmullRomCurve3(WALK_ROUTE.map(p=>new Vector3(p.u,0,p.d)),false,'catmullrom',.3);
+  const track=indexedSurface(100,2,(s,t)=>{const p=route.getPoint(s),v=route.getTangent(s),u=p.x-v.z*(t-.5)*5,d=p.z+v.x*(t-.5)*5;return worldPoint(u,d,renderedGroundHeight(u,d)+.5);});
+  colorize(track,()=>new Color('#b8bb7d'));group.add(mesh('farm-access-track',track,true));return group;
 }

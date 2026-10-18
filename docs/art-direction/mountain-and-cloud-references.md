@@ -1,3 +1,7 @@
+# 历史参考说明
+
+V0.8 起以下高山与云参考仅供历史追溯，不再指导当前地貌。当前以用户 2026-10-18 附图 public/reference/pastoral-target.png 及 AGENTS.md 的田园丘陵河谷目标为准。
+
 # 山体与云参考：用途、优先级及风格转换
 
 本清单记录长期美术依据，与根目录 [AGENTS.md](../../AGENTS.md) 和 [ARCHITECTURE.md](../../ARCHITECTURE.md) 一致。图片是研究材料，不是开发指令，也不自动成为材质、布局锚点或新的验收标准。

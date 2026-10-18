@@ -8,8 +8,8 @@ const screen=(u:number,d:number,h:number)=>{const p=projectPoint(u,d,h);return `
 const polygon=(points:string[],fill:string,extra='')=>`<polygon points="${points.join(' ')}" fill="${fill}" ${extra}/>`;
 function corners(placement:ScenePlacement,width=placement.footprint.width,depth=placement.footprint.depth,offsetX=0,offsetZ=0) {
   return [[-width/2,-depth/2],[width/2,-depth/2],[width/2,depth/2],[-width/2,depth/2]].map(([x,z])=>{
-    const u=placement.u+(x+offsetX-z-offsetZ)*q;
-    const d=placement.d-(x+offsetX+z+offsetZ)*q;
+    const u=placement.u+(placement.kind==='bridge'?x+offsetX:(x+offsetX-z-offsetZ)*q);
+    const d=placement.d+(placement.kind==='bridge'?z+offsetZ:-(x+offsetX+z+offsetZ)*q);
     return {u,d,h:groundHeight(u,d)};
   });
 }
@@ -30,7 +30,7 @@ function shape(placement:ScenePlacement) {
   if(placement.kind==='footprint')return polygon(outline,'#d7ddc5','fill-opacity=".26" stroke="#66735d" stroke-width="1.2" stroke-dasharray="4 4"');
   if(placement.kind==='bridge') {
     const deck=Math.max(...vertices.map(p=>p.h))+placement.height;
-    const pillars=[-82,0,82].map(x=>volume(placement,14,22,deck-groundHeight(placement.u+x*q,placement.d-x*q),x)).join('');
+    const pillars=[-150,-75,0,75,150].map(x=>volume(placement,14,22,deck-groundHeight(placement.u+x,placement.d),x)).join('');
     const train=[-36,-2,32].map(x=>volume(placement,27,19,14,x,deck+7)).join('');
     return pillars+volume(placement,undefined,undefined,7,0,deck)+train;
   }

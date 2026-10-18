@@ -2,7 +2,7 @@ import { groundHeight, LIVING_AREA } from '../terrain/layout';
 import { projectPoint } from '../world/projection';
 
 export type SceneSlot = 'home' | 'tractor' | 'bridge' | 'cabin' | 'observatory' | 'pod' | 'pen' | 'flock' | 'pumpkins' | 'grounds';
-export type CompositionView = 'terrain' | 'proxy';
+export type CompositionView = 'terrain' | 'river' | 'proxy' | 'assets';
 export interface ScenePlacement {
   slot: SceneSlot;
   name: string;
@@ -16,10 +16,10 @@ export interface ScenePlacement {
 
 // Narrative zones follow the land. SVG source IDs, source feet and scales belong to assets.ts.
 export const SCENE_PLACEMENTS: ScenePlacement[] = [
-  {slot:'bridge',name:'桥 / 火车',u:-645,d:810,footprint:{width:480,depth:40},height:48,kind:'bridge'},
-  {slot:'observatory',name:'通讯设施',u:460,d:-120,footprint:{width:76,depth:62},height:48,kind:'volume'},
+  {slot:'bridge',name:'桥 / 火车',u:-530,d:1190,footprint:{width:400,depth:30},height:48,kind:'bridge'},
+  {slot:'observatory',name:'通讯设施',u:420,d:-150,footprint:{width:76,depth:62},height:48,kind:'volume'},
   {slot:'home',name:'主屋生活区',u:LIVING_AREA.u,d:LIVING_AREA.d,footprint:{width:350,depth:205},height:82,kind:'volume'},
-  {slot:'tractor',name:'拖拉机',u:-500,d:170,footprint:{width:48,depth:30},height:20,kind:'volume'},
+  {slot:'tractor',name:'拖拉机',u:-570,d:150,footprint:{width:48,depth:30},height:20,kind:'volume'},
   {slot:'cabin',name:'小木屋',u:-240,d:-290,footprint:{width:90,depth:70},height:38,kind:'volume'},
   {slot:'pod',name:'生活舱',u:405,d:-390,footprint:{width:80,depth:56},height:34,kind:'volume'},
   {slot:'grounds',name:'辅助设施',u:-390,d:-425,footprint:{width:68,depth:48},height:14,kind:'volume'},

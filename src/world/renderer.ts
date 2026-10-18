@@ -1,7 +1,6 @@
-import { Scene, WebGLRenderer, CanvasTexture, SRGBColorSpace, Mesh, MeshBasicMaterial, MeshStandardMaterial, HemisphereLight, DirectionalLight, type Object3D } from 'three';
+import { Scene, Group, WebGLRenderer, CanvasTexture, SRGBColorSpace, Mesh, MeshBasicMaterial, MeshStandardMaterial, HemisphereLight, DirectionalLight, type Object3D } from 'three';
 import { createOverviewCamera, FRAME, type Frame } from './projection';
-import { buildTerrain, buildFields, buildMeadowZones } from '../terrain/geometry';
-import { buildCloudSea } from './cloudSea';
+import { buildTerrain, buildRiver, buildFields, buildMeadowZones } from '../terrain/geometry';
 import { AUTUMN } from './environment';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { createInspectionCamera, setInspectionPose, type CameraView } from './inspection';
@@ -19,7 +18,8 @@ export class LandscapeRenderer {
   private readonly controls:OrbitControls;
   private cameraView:CameraView='target';
   private readonly inspectionMaterial=new MeshStandardMaterial({color:'#a3aca8',roughness:1});
-  readonly clouds=buildCloudSea();
+  readonly clouds=new Group(); // Compatibility flag for the static, thin aerial wash.
+  readonly river=buildRiver();
   private readonly sky:CanvasTexture;
   private wire=false;
   constructor(canvas:HTMLCanvasElement,readonly frame:Frame=FRAME,readonly benchmark=true) {
@@ -35,11 +35,11 @@ export class LandscapeRenderer {
     drawSky(skyContext,frame.width,frame.height);
     this.sky=new CanvasTexture(skyCanvas);this.sky.colorSpace=SRGBColorSpace;
     this.scene.background=this.sky;
-    this.scene.add(buildTerrain(),this.clouds);
-    if(!benchmark)this.scene.add(buildFields(),buildMeadowZones());
+    this.scene.add(buildTerrain(),buildFields(),buildMeadowZones(),this.river,this.clouds);
+    this.river.visible=false;
     // Neutral clay reveals real normals in inspection; target baked colours and
     // the frozen cloud material are restored unchanged on returning to target.
-    const fill=new HemisphereLight('#fff7e6','#52616b',.8);
+    const fill=new HemisphereLight('#fff7e6','#52616b',.45);
     const sun=new DirectionalLight('#fff5df',2);sun.position.set(-2000,3500,1500);
     this.scene.add(fill,sun);
     this.controls=new OrbitControls(this.inspectionCamera,canvas);
@@ -69,12 +69,13 @@ export class LandscapeRenderer {
     this.scene.traverse(o=>{if(o instanceof Mesh&&o.userData.clearColors)o.geometry.setAttribute('color',enabled?o.userData.cloudColors:o.userData.clearColors);});
     this.render();
   }
+  setRiver(enabled:boolean){this.river.visible=enabled;this.render();}
   setWireframe(enabled:boolean) {
     this.wire=enabled;
     this.inspectionMaterial.wireframe=enabled;
     this.scene.traverse(o=>{if(o instanceof Mesh){(o.material as MeshBasicMaterial).wireframe=enabled;if(o.userData.targetMaterial)o.userData.targetMaterial.wireframe=enabled;}});this.render();
   }
   render() {this.renderer.render(this.scene,this.cameraView==='target'?this.camera:this.inspectionCamera);}
-  get stats() {return {drawCalls:this.renderer.info.render.calls,triangles:this.renderer.info.render.triangles,wireframe:this.wire,clouds:this.clouds.visible,benchmark:this.benchmark,frame:this.frame,cameraView:this.cameraView,targetCameraMatrix:this.camera.matrixWorld.toArray(),inspectionCameraMatrix:this.inspectionCamera.matrixWorld.toArray()};}
+  get stats() {return {drawCalls:this.renderer.info.render.calls,triangles:this.renderer.info.render.triangles,wireframe:this.wire,clouds:this.clouds.visible,river:this.river.visible,benchmark:this.benchmark,frame:this.frame,cameraView:this.cameraView,targetCameraMatrix:this.camera.matrixWorld.toArray(),inspectionCameraMatrix:this.inspectionCamera.matrixWorld.toArray()};}
   dispose(){this.controls.removeEventListener('change',this.renderInspection);this.controls.dispose();this.scene.traverse((o:Object3D)=>{if(o instanceof Mesh){o.geometry.dispose();(o.userData.targetMaterial??o.material).dispose();}});this.inspectionMaterial.dispose();this.sky.dispose();this.renderer.dispose();}
 }

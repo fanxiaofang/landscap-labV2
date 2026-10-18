@@ -1,38 +1,23 @@
 # Live With Me · Landscape V2
 
-当前为 **V0.7 Terrain Foundation**，基于 V0.6 持续迭代。四张 1600×900 候选图见下方，**等待人工美术验收，不进入下一阶段**。
+当前为 **V0.8 田园丘陵河谷**。本轮将旧高山云海方向改为连续的宽缓草丘、河谷、左侧顺坡农田和低远山。状态为待作者美术审阅。
 
-长期规范见 [AGENTS.md](AGENTS.md)，实现与未来边界见 [ARCHITECTURE.md](ARCHITECTURE.md)，参考用途见 [美术参考清单](docs/art-direction/mountain-and-cloud-references.md)。
-
-## 查看
+规范见 [AGENTS.md](AGENTS.md)，实现见 [ARCHITECTURE.md](ARCHITECTURE.md)，交付说明见 [evidence/v08/REVIEW.md](evidence/v08/REVIEW.md)。
 
 ```powershell
 npm ci
 npm run dev
 ```
 
-打开 http://127.0.0.1:4180/ 。默认纯地形与秋季定稿对照，保留静态云海、并排、叠图、擦拭和 PNG 导出。顶部“检查视角”可选目标正交、自由斜视、俯视结构、侧向坡度；自由视角拖动旋转、右键平移、滚轮缩放，返回目标正交恢复原构图与着色。
+打开 http://127.0.0.1:4180/ 。顶部依次为纯地形、河流轻雾、Proxy、正式 SVG 对照。检查视角支持斜视、俯视、侧视及鼠标旋转 / 平移 / 缩放，返回目标正交恢复构图。
 
-- `/?clouds=0`：目标正交无云地形。
-- `/?clouds=1`：冻结的静态云海占位。
-- `/?camera=oblique`、`/?camera=top`、`/?camera=side`：自由检查预设，中性材质便于辨认坡面。
-- `/?study=layout&view=proxy&frame=integration`：1200×800 SVG 兼容性画幅，只使用 Proxy，正式 SVG 未接入。
-
-## 本轮交付
-
-| 文件 | 内容 |
-| --- | --- |
-| [01-terrain-target.png](evidence/v07/01-terrain-target.png) | 1600×900 目标正交无云完整地形 |
-| [02-free-inspection.png](evidence/v07/02-free-inspection.png) | 1600×900 自由视角地形结构 |
-| [03-static-cloud-placeholder.png](evidence/v07/03-static-cloud-placeholder.png) | 1600×900 现有静态云海占位 |
-| [04-v06-v07-autumn-comparison.png](evidence/v07/04-v06-v07-autumn-comparison.png) | 1600×900 三方对照，上排无云、下排静态云 |
-| [REVIEW.md](evidence/v07/REVIEW.md) | 地貌改动、实际截图差距与停止点 |
-| [geometry-report.json](evidence/v07/geometry-report.json) | 连续网格、孔洞、坡面采样与投影检查 |
-| [browser-report.json](evidence/v07/browser-report.json) | 自由视角交互、导出、恢复、天空及兼容性检查 |
-
-`evidence/v07/baseline/` 保存修改前 V0.6 实际截图和源文件哈希；`checks/` 保存俯视、侧视、1200×800 Proxy 与浏览器辅助证据。V0.6 及更早图像保持不变。
-
-## 重现检查与出图
+- `/?view=terrain`：纯地形，含农田材质与无水河床。
+- `/?view=river`：河流及局部轻薄雾。
+- `/?view=proxy`：简单体块布局。
+- `/?view=assets`：原始正式 SVG 适配后的叠加对照。
+- `/?camera=oblique`、`top`、`side`：自由结构检查。
+- `/?view=assets&frame=integration`：1200×800 兼容性检查。
+- `clouds=0` 是兼容保留的参数名，当前含义为关闭轻雾。
 
 ```powershell
 npm run check:geometry
@@ -40,6 +25,17 @@ npm run build
 npm run test:visual
 ```
 
-视觉检查需要本地 4180 服务和 Playwright Chromium / SwiftShader，`PREVIEW_URL` 可覆盖地址。`npm run capture:benchmark` 与完整视觉检查相同，重建四张交付图及辅助证据，不覆盖 V0.6 基线。
+浏览器检查需要本地 4180 服务及 Playwright Chromium；可用 PREVIEW_URL 覆盖地址。截图写入 `evidence/v08/`，不覆盖旧版本。
 
-工程通过不能替代美术验收。当前云、设施接地和正式资产集成的局限见本轮审阅说明。
+| 文件 | 内容 |
+| --- | --- |
+| [01-terrain.png](evidence/v08/01-terrain.png) | 纯地形 |
+| [02-river-light-mist.png](evidence/v08/02-river-light-mist.png) | 河流与轻雾 |
+| [03-proxy.png](evidence/v08/03-proxy.png) | Proxy 布局 |
+| [04-formal-svg.png](evidence/v08/04-formal-svg.png) | 正式 SVG 对照 |
+| [05-free-inspection.png](evidence/v08/05-free-inspection.png) | 自由视角结构 |
+| [06-comparison.png](evidence/v08/06-comparison.png) | V0.7、本轮与田园参考对照 |
+| [geometry-report.json](evidence/v08/geometry-report.json) | 网格、坡度、农田延伸和落点检查 |
+| [browser-report.json](evidence/v08/browser-report.json) | 浏览器和导出检查 |
+
+薄雾是静态局部空气透视。SVG 为目标视角对照层，有限地表有开放外边界。工程通过不替代人工美术验收。

@@ -7,10 +7,10 @@
     "dev": "vite --host 127.0.0.1 --port 4180 --strictPort",
     "build": "tsc -b && vite build",
     "preview": "vite preview --host 127.0.0.1 --port 4180 --strictPort",
-    "check:geometry": "tsx scripts/check-v07.ts",
+    "check:geometry": "tsx scripts/check-v08.ts",
     "capture:reference": "node scripts/capture-reference.mjs",
-    "test:visual": "node scripts/verify-v07.mjs",
-    "capture:benchmark": "node scripts/verify-v07.mjs"
+    "test:visual": "node scripts/verify-v08.mjs",
+    "capture:benchmark": "node scripts/verify-v08.mjs"
   },
   "dependencies": {
     "delaunator": "^5.1.0",

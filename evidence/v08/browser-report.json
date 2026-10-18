@@ -1,0 +1,135 @@
+{
+  "version": "0.8",
+  "passed": true,
+  "artApproval": "PENDING_AUTHOR_REVIEW",
+  "checks": [
+    "Free oblique/top/side inspected first; real pointer orbit/pan/zoom and fixed target camera restoration pass.",
+    "All four stages exported in order as deterministic 1600×900 PNGs; original SVG loaded only at stage four.",
+    "Thin mist changes only a bounded fraction of pixels; river/mist export states and target materials restore exactly. Actual download button matches the export.",
+    "Reference side/overlay/wipe controls, four responsive widths and 1200×800 formal SVG framing pass."
+  ],
+  "views": [
+    {
+      "pose": "oblique",
+      "matrix": [
+        0.9820771339102746,
+        0,
+        -0.18847944994237595,
+        0,
+        -0.0963551171289261,
+        0.8594478289823073,
+        -0.5020608734612464,
+        0,
+        0.16198825406075448,
+        0.5112234631329031,
+        0.8440440606323522,
+        0,
+        -70.71067811865476,
+        2200,
+        2757.7164466275353,
+        1
+      ]
+    },
+    {
+      "pose": "top",
+      "matrix": [
+        0.7071067811863708,
+        7.071067811836862e-7,
+        -0.7071067811863707,
+        0,
+        -0.7071067811867242,
+        7.07106781128175e-7,
+        -0.7071067811860173,
+        0,
+        0,
+        0.9999999999995001,
+        9.999999999177334e-7,
+        0,
+        -424.2640687119285,
+        8999.99999999554,
+        -424.2551487119285,
+        1
+      ]
+    },
+    {
+      "pose": "side",
+      "matrix": [
+        0.7441038121219035,
+        -1.0408340855860843e-17,
+        0.6680640065036068,
+        0,
+        0.053198336404039814,
+        0.9968244418386487,
+        -0.059253431604499626,
+        0,
+        -0.6659425303954492,
+        0.07963059809562216,
+        0.7417408671884271,
+        0,
+        -5091.168824543142,
+        599.9999999999997,
+        4101.219330881976,
+        1
+      ]
+    }
+  ],
+  "mistPixels": {
+    "changedRatio": 0.21866875,
+    "maxChannelDelta": 20,
+    "meanDelta": 1.320592361111111
+  },
+  "responsive": [
+    {
+      "width": 1600,
+      "current": {
+        "width": 614,
+        "height": 345.375
+      },
+      "reference": {
+        "width": 614,
+        "height": 345.375
+      },
+      "scroll": 1600
+    },
+    {
+      "width": 1024,
+      "current": {
+        "width": 466,
+        "height": 262.125
+      },
+      "reference": {
+        "width": 466,
+        "height": 262.125
+      },
+      "scroll": 1024
+    },
+    {
+      "width": 768,
+      "current": {
+        "width": 338,
+        "height": 190.125
+      },
+      "reference": {
+        "width": 338,
+        "height": 190.125
+      },
+      "scroll": 768
+    },
+    {
+      "width": 390,
+      "current": {
+        "width": 358,
+        "height": 201.375
+      },
+      "reference": {
+        "width": 358,
+        "height": 201.375
+      },
+      "scroll": 390
+    }
+  ],
+  "formalRequests": 2,
+  "errors": [],
+  "browser": "141.0.7390.37",
+  "renderer": "Chromium SwiftShader"
+}
