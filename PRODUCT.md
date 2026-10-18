@@ -1,5 +1,13 @@
 # Live With Me Landscape V2
 
+## Current experiment: Phase B1
+
+当前任务覆盖下方 V0.8 历史设计原则：只验证 Three.js 中远景，保留原始 SVG 生活草甸与设施，不制作新的前景或整幅 Heightfield。采用独立曲线驱动山体、真实漫反射受光、3 层低远山和开阔河谷。以 `public/reference/pastoral-target.png` 为构图参考。
+
+B1 入口为 `?mode=b1`，V0.8 根入口和 `?mode=v08` 保留。验收先看无 SVG 的自由坡面，再看目标正交、SVG 合成及相机平移缩放边界。状态为等待人工美术验收，不自动推进下一阶段。
+
+## V0.8 historical context
+
 ## Register
 
 product

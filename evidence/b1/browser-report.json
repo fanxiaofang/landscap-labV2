@@ -1,0 +1,473 @@
+{
+  "phase": "B1",
+  "passed": true,
+  "artApproval": "PENDING_AUTHOR_REVIEW",
+  "checks": [
+    "Free oblique, top and side geometry; real pointer orbit, pan, zoom; target matrix unchanged.",
+    "Deterministic 3D-only export; no SVG or V0.8 runtime import; neutral-light reversal measurably changes real surface shading.",
+    "Original SVG meadow/house/sheep/facilities/bridge/train/tractor preserved; old sky/mountains excluded; real download equals composite export.",
+    "Six target navigation boundary states, 3D-only plus composite; pointer pan/zoom, reset, parallax and four responsive widths.",
+    "1200×800 integration export; V0.8 rollback output is byte-identical to the committed baseline."
+  ],
+  "lightChange": {
+    "changedRatio": 0.3241715277777778,
+    "meanDelta": 9.621406944444445,
+    "maxDelta": 86
+  },
+  "assets": {
+    "present": [
+      "panoramic-world-stage",
+      "master-axonometric-ground-plane",
+      "living-cottage-haven",
+      "wooden-cabin-cluster",
+      "yorkshire-sheep-flock-and-dressing",
+      "yorkshire-sheep-pen-cluster",
+      "yorkshire-railway-viaduct",
+      "ribblehead-steam-train",
+      "tractor-in-field"
+    ],
+    "oldMountains": false,
+    "sky": false
+  },
+  "states": [
+    {
+      "name": "wide-left-up",
+      "mode": "b1",
+      "frame": {
+        "width": 1600,
+        "height": 900
+      },
+      "view": "target",
+      "navigation": {
+        "x": -100,
+        "y": -45,
+        "zoom": 0.9
+      },
+      "parallax": true,
+      "neutral": false,
+      "wire": false,
+      "river": true,
+      "drawCalls": 12,
+      "triangles": 246794,
+      "targetMatrix": [
+        0.7071067811865476,
+        1.3877787807814457e-17,
+        -0.7071067811865475,
+        0,
+        -0.20017361085060348,
+        0.9590938697739978,
+        -0.20017361085060348,
+        0,
+        0.6781817791116413,
+        0.2830882352941176,
+        0.6781817791116413,
+        0,
+        8226.757450014067,
+        3549.104130040712,
+        8069.622609750389,
+        1
+      ],
+      "inspectionMatrix": [
+        0.9375158833195585,
+        2.7755575615628914e-17,
+        0.347942478756975,
+        0,
+        0.235376411336094,
+        0.736460255528691,
+        -0.6342115081052669,
+        0,
+        -0.256245806814648,
+        0.6764808142339406,
+        0.6904431869917285,
+        0,
+        -2155.097049648306,
+        4122.730736466889,
+        3587.3312150652046,
+        1
+      ],
+      "meshNames": [
+        "west-open-shoulder",
+        "east-valley-shoulder",
+        "east-near-fold",
+        "outer-dales",
+        "western-distant-dale",
+        "eastern-distant-dale",
+        "west-low-ridge",
+        "east-low-ridge",
+        "open-floodplain",
+        "river",
+        "river-soft-banks"
+      ]
+    },
+    {
+      "name": "wide-right-down",
+      "mode": "b1",
+      "frame": {
+        "width": 1600,
+        "height": 900
+      },
+      "view": "target",
+      "navigation": {
+        "x": 100,
+        "y": 45,
+        "zoom": 0.9
+      },
+      "parallax": true,
+      "neutral": false,
+      "wire": false,
+      "river": true,
+      "drawCalls": 12,
+      "triangles": 246794,
+      "targetMatrix": [
+        0.7071067811865476,
+        1.3877787807814457e-17,
+        -0.7071067811865475,
+        0,
+        -0.20017361085060348,
+        0.9590938697739978,
+        -0.20017361085060348,
+        0,
+        0.6781817791116413,
+        0.2830882352941176,
+        0.6781817791116413,
+        0,
+        8049.605248665329,
+        3645.0135170181115,
+        8206.740088929006,
+        1
+      ],
+      "inspectionMatrix": [
+        0.9375158833195585,
+        2.7755575615628914e-17,
+        0.347942478756975,
+        0,
+        0.235376411336094,
+        0.736460255528691,
+        -0.6342115081052669,
+        0,
+        -0.256245806814648,
+        0.6764808142339406,
+        0.6904431869917285,
+        0,
+        -2155.097049648306,
+        4122.730736466889,
+        3587.3312150652046,
+        1
+      ],
+      "meshNames": [
+        "west-open-shoulder",
+        "east-valley-shoulder",
+        "east-near-fold",
+        "outer-dales",
+        "western-distant-dale",
+        "eastern-distant-dale",
+        "west-low-ridge",
+        "east-low-ridge",
+        "open-floodplain",
+        "river",
+        "river-soft-banks"
+      ]
+    },
+    {
+      "name": "close-left-down",
+      "mode": "b1",
+      "frame": {
+        "width": 1600,
+        "height": 900
+      },
+      "view": "target",
+      "navigation": {
+        "x": -100,
+        "y": 45,
+        "zoom": 1.18
+      },
+      "parallax": true,
+      "neutral": false,
+      "wire": false,
+      "river": true,
+      "drawCalls": 12,
+      "triangles": 246794,
+      "targetMatrix": [
+        0.7071067811865476,
+        1.3877787807814457e-17,
+        -0.7071067811865475,
+        0,
+        -0.20017361085060348,
+        0.9590938697739978,
+        -0.20017361085060348,
+        0,
+        0.6781817791116413,
+        0.2830882352941176,
+        0.6781817791116413,
+        0,
+        8190.471913433238,
+        3633.6344372072335,
+        8070.623306452467,
+        1
+      ],
+      "inspectionMatrix": [
+        0.9375158833195585,
+        2.7755575615628914e-17,
+        0.347942478756975,
+        0,
+        0.235376411336094,
+        0.736460255528691,
+        -0.6342115081052669,
+        0,
+        -0.256245806814648,
+        0.6764808142339406,
+        0.6904431869917285,
+        0,
+        -2155.097049648306,
+        4122.730736466889,
+        3587.3312150652046,
+        1
+      ],
+      "meshNames": [
+        "west-open-shoulder",
+        "east-valley-shoulder",
+        "east-near-fold",
+        "outer-dales",
+        "western-distant-dale",
+        "eastern-distant-dale",
+        "west-low-ridge",
+        "east-low-ridge",
+        "open-floodplain",
+        "river",
+        "river-soft-banks"
+      ]
+    },
+    {
+      "name": "close-right-up",
+      "mode": "b1",
+      "frame": {
+        "width": 1600,
+        "height": 900
+      },
+      "view": "target",
+      "navigation": {
+        "x": 100,
+        "y": -45,
+        "zoom": 1.18
+      },
+      "parallax": true,
+      "neutral": false,
+      "wire": false,
+      "river": true,
+      "drawCalls": 12,
+      "triangles": 246794,
+      "targetMatrix": [
+        0.7071067811865476,
+        1.3877787807814457e-17,
+        -0.7071067811865475,
+        0,
+        -0.20017361085060348,
+        0.9590938697739978,
+        -0.20017361085060348,
+        0,
+        0.6781817791116413,
+        0.2830882352941176,
+        0.6781817791116413,
+        0,
+        8085.890785246157,
+        3560.48320985159,
+        8205.739392226928,
+        1
+      ],
+      "inspectionMatrix": [
+        0.9375158833195585,
+        2.7755575615628914e-17,
+        0.347942478756975,
+        0,
+        0.235376411336094,
+        0.736460255528691,
+        -0.6342115081052669,
+        0,
+        -0.256245806814648,
+        0.6764808142339406,
+        0.6904431869917285,
+        0,
+        -2155.097049648306,
+        4122.730736466889,
+        3587.3312150652046,
+        1
+      ],
+      "meshNames": [
+        "west-open-shoulder",
+        "east-valley-shoulder",
+        "east-near-fold",
+        "outer-dales",
+        "western-distant-dale",
+        "eastern-distant-dale",
+        "west-low-ridge",
+        "east-low-ridge",
+        "open-floodplain",
+        "river",
+        "river-soft-banks"
+      ]
+    },
+    {
+      "name": "pan-left",
+      "mode": "b1",
+      "frame": {
+        "width": 1600,
+        "height": 900
+      },
+      "view": "target",
+      "navigation": {
+        "x": -100,
+        "y": 0,
+        "zoom": 1
+      },
+      "parallax": true,
+      "neutral": false,
+      "wire": false,
+      "river": true,
+      "drawCalls": 12,
+      "triangles": 246794,
+      "targetMatrix": [
+        0.7071067811865476,
+        1.3877787807814457e-17,
+        -0.7071067811865475,
+        0,
+        -0.20017361085060348,
+        0.9590938697739978,
+        -0.20017361085060348,
+        0,
+        0.6781817791116413,
+        0.2830882352941176,
+        0.6781817791116413,
+        0,
+        8208.892027458352,
+        3597.0588235294117,
+        8067.470671221043,
+        1
+      ],
+      "inspectionMatrix": [
+        0.9375158833195585,
+        2.7755575615628914e-17,
+        0.347942478756975,
+        0,
+        0.235376411336094,
+        0.736460255528691,
+        -0.6342115081052669,
+        0,
+        -0.256245806814648,
+        0.6764808142339406,
+        0.6904431869917285,
+        0,
+        -2155.097049648306,
+        4122.730736466889,
+        3587.3312150652046,
+        1
+      ],
+      "meshNames": [
+        "west-open-shoulder",
+        "east-valley-shoulder",
+        "east-near-fold",
+        "outer-dales",
+        "western-distant-dale",
+        "eastern-distant-dale",
+        "west-low-ridge",
+        "east-low-ridge",
+        "open-floodplain",
+        "river",
+        "river-soft-banks"
+      ]
+    },
+    {
+      "name": "pan-right",
+      "mode": "b1",
+      "frame": {
+        "width": 1600,
+        "height": 900
+      },
+      "view": "target",
+      "navigation": {
+        "x": 100,
+        "y": 0,
+        "zoom": 1
+      },
+      "parallax": true,
+      "neutral": false,
+      "wire": false,
+      "river": true,
+      "drawCalls": 12,
+      "triangles": 246794,
+      "targetMatrix": [
+        0.7071067811865476,
+        1.3877787807814457e-17,
+        -0.7071067811865475,
+        0,
+        -0.20017361085060348,
+        0.9590938697739978,
+        -0.20017361085060348,
+        0,
+        0.6781817791116413,
+        0.2830882352941176,
+        0.6781817791116413,
+        0,
+        8067.470671221043,
+        3597.0588235294117,
+        8208.892027458352,
+        1
+      ],
+      "inspectionMatrix": [
+        0.9375158833195585,
+        2.7755575615628914e-17,
+        0.347942478756975,
+        0,
+        0.235376411336094,
+        0.736460255528691,
+        -0.6342115081052669,
+        0,
+        -0.256245806814648,
+        0.6764808142339406,
+        0.6904431869917285,
+        0,
+        -2155.097049648306,
+        4122.730736466889,
+        3587.3312150652046,
+        1
+      ],
+      "meshNames": [
+        "west-open-shoulder",
+        "east-valley-shoulder",
+        "east-near-fold",
+        "outer-dales",
+        "western-distant-dale",
+        "eastern-distant-dale",
+        "west-low-ridge",
+        "east-low-ridge",
+        "open-floodplain",
+        "river",
+        "river-soft-banks"
+      ]
+    }
+  ],
+  "responsive": [
+    {
+      "width": 1248,
+      "height": 702,
+      "scroll": 1600
+    },
+    {
+      "width": 952,
+      "height": 535.5,
+      "scroll": 1024
+    },
+    {
+      "width": 696,
+      "height": 391.5,
+      "scroll": 768
+    },
+    {
+      "width": 358,
+      "height": 201.375,
+      "scroll": 390
+    }
+  ],
+  "errors": [],
+  "browser": "141.0.7390.37",
+  "renderer": "Chromium SwiftShader"
+}
